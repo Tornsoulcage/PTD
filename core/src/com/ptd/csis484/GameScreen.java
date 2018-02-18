@@ -8,6 +8,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthoCachedTiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
 
 /**
@@ -27,8 +28,8 @@ public class GameScreen implements Screen {
         camera.setToOrtho(false, 480, 320);
         camera.update();
 
-        tiledMap = new TmxMapLoader().load("assets/PTDMap.tmx");
-        tiledMapRenderer = new OrthoCachedTiledMapRenderer(tiledMap);
+        tiledMap = new TmxMapLoader().load("PTDMap.tmx");
+        tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
     }
 
     @Override
