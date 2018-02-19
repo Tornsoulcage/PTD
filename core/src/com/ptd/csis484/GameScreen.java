@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.maps.tiled.renderers.OrthoCachedTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
 
@@ -23,9 +22,11 @@ public class GameScreen implements Screen {
 
     public GameScreen(final PTD game){
         this.game = game;
+        int viewportWidth = 480;
+        int viewportHeight = 320;
 
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 480, 320);
+        camera.setToOrtho(false, viewportWidth, viewportHeight);
         camera.update();
 
         tiledMap = new TmxMapLoader().load("PTDMap.tmx");
