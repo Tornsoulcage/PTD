@@ -4,10 +4,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+
 
 
 /**
@@ -19,18 +21,21 @@ public class GameScreen implements Screen {
     OrthographicCamera camera;
     TiledMap tiledMap;
     TiledMapRenderer tiledMapRenderer;
+    ShapeRenderer shapeRenderer;
+    Enemy enemy1;
 
-    public GameScreen(final PTD game){
+    public GameScreen(final PTD game) {
         this.game = game;
         int viewportWidth = 480;
         int viewportHeight = 320;
-
+        shapeRenderer = new ShapeRenderer();
         camera = new OrthographicCamera();
         camera.setToOrtho(false, viewportWidth, viewportHeight);
         camera.update();
 
         tiledMap = new TmxMapLoader().load("PTDMap.tmx");
         tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
+        enemy1 = new Enemy(Enemy.enemyType.ROCK);
     }
 
     @Override
@@ -41,6 +46,10 @@ public class GameScreen implements Screen {
         camera.update();
         tiledMapRenderer.setView(camera);
         tiledMapRenderer.render();
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        enemy1.update(delta);
+        enemy1.render(shapeRenderer);
+        shapeRenderer.end();
     }
 
     @Override
