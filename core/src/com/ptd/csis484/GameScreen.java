@@ -10,6 +10,8 @@ import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -26,8 +28,10 @@ public class GameScreen implements Screen {
     TiledMapRenderer tiledMapRenderer;
     ShapeRenderer shapeRenderer;
 
-    //Just a test enemy
-    Enemy enemy1;
+    //Just a test enemy list and counter
+    List<Enemy> enemyList = new ArrayList<Enemy>();
+    int enemyCount = 0;
+    int renderCount = 0;
 
     //Creating the Screen and rendering a test map
     public GameScreen(final PTD game) {
@@ -45,8 +49,6 @@ public class GameScreen implements Screen {
         //Shape Renderer is how we draw the enemies
         shapeRenderer = new ShapeRenderer();
 
-        //Test enemy
-        enemy1 = new Enemy(Enemy.enemyType.ROCK);
     }
 
     //The "game loop"
@@ -61,8 +63,22 @@ public class GameScreen implements Screen {
 
         //Drawing the enemies and updating them
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        enemy1.update(delta);
-        enemy1.render(shapeRenderer);
+
+        //Spawns a new enemy every 40 renders
+        if(renderCount % 40 == 0) {
+            //Wave size is 20 enemies so we stop once we get there
+            if(enemyCount != 20) {
+                enemyList.add(new Enemy(Enemy.enemyType.ROCK));
+                enemyCount++;
+            }
+        }
+        renderCount++;
+
+        //Update loop for all of the enemies
+        for(int i = 0; i < enemyList.size(); i++){
+            enemyList.get(i).update(delta);
+            enemyList.get(i).render(shapeRenderer);
+        }
         shapeRenderer.end();
     }
 
