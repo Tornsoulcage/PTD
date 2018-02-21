@@ -9,16 +9,19 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
  * Created by scott on 2/18/2018.
  */
 
+//Represents the Main Menu/Start Screen
 public class MainMenuScreen implements Screen {
     final PTD game;
     OrthographicCamera camera;
 
+    //Setting the view to our map size
     public MainMenuScreen(final PTD game){
         this.game = game;
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 480, 320);
     }
 
+    //Just draws a simple welcome screen
     @Override
     public void render(float delta){
         Gdx.gl.glClearColor(0,0,0.2f,1);
@@ -32,6 +35,7 @@ public class MainMenuScreen implements Screen {
         game.font.draw(game.batch, "Tap anywhere to begin.", 100, 100);
         game.batch.end();
 
+        //If the user taps the screen we start the game
         if(Gdx.input.isTouched()){
             game.setScreen(new GameScreen(game));
             dispose();
