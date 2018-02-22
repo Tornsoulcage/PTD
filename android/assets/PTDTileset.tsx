@@ -8,6 +8,9 @@
   <image width="32" height="32" source="Tiles/grass_full.png"/>
  </tile>
  <tile id="7">
+  <properties>
+   <property name="TowerTile" value="true"/>
+  </properties>
   <image width="32" height="32" source="Tiles/grass0-dirt-mix1.png"/>
  </tile>
 </tileset>

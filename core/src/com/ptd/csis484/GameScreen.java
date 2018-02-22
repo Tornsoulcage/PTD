@@ -36,6 +36,8 @@ public class GameScreen implements Screen, InputProcessor {
 
     float deviceHeight = Gdx.graphics.getHeight();
     float deviceWidth = Gdx.graphics.getWidth();
+    float tileHeight = deviceHeight/10;
+    float tileWidth = deviceWidth/15;
 
     //Just a test enemy list and counter
     List<Enemy> enemyList = new ArrayList<Enemy>();
@@ -146,7 +148,17 @@ public class GameScreen implements Screen, InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        towerList.add(new Tower(Tower.towerType.ROCK, screenX, screenY));
+        float cellX = screenX/tileWidth;
+        float cellY = screenY/tileHeight;
+        cellX = MathUtils.floor(cellX);
+        cellY = MathUtils.floor(cellY);
+
+        TiledMapTileLayer layer = (TiledMapTileLayer) tiledMap.getLayers().get(0);
+        TiledMapTileLayer.Cell cell = layer.getCell((int) cellX, (int) (10 - 1 - cellY));
+        Object property = cell.getTile().getProperties().get("TowerTile");
+
+        if(property != null)
+            towerList.add(new Tower(Tower.towerType.ROCK, cellX, cellY));
         return false;
     }
 
