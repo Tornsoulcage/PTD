@@ -1,14 +1,20 @@
 package com.ptd.csis484;
 
+import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +25,7 @@ import java.util.List;
  */
 
 //Represents the Game Screen. Where we actually play the game
-public class GameScreen implements Screen {
+public class GameScreen implements Screen, InputProcessor {
     final PTD game;
     OrthographicCamera camera;
 
@@ -28,16 +34,22 @@ public class GameScreen implements Screen {
     TiledMapRenderer tiledMapRenderer;
     ShapeRenderer shapeRenderer;
 
+    float deviceHeight = Gdx.graphics.getHeight();
+    float deviceWidth = Gdx.graphics.getWidth();
+
     //Just a test enemy list and counter
     List<Enemy> enemyList = new ArrayList<Enemy>();
     int enemyCount = 0;
     int renderCount = 0;
+
+    List<Tower> towerList = new ArrayList<Tower>();
 
     //Creating the Screen and rendering a test map
     public GameScreen(final PTD game) {
         this.game = game;
         int viewportWidth = 480;
         int viewportHeight = 320;
+
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, viewportWidth, viewportHeight);
@@ -48,7 +60,7 @@ public class GameScreen implements Screen {
 
         //Shape Renderer is how we draw the enemies
         shapeRenderer = new ShapeRenderer();
-
+        Gdx.input.setInputProcessor(this);
     }
 
     //The "game loop"
@@ -63,6 +75,10 @@ public class GameScreen implements Screen {
 
         //Drawing the enemies and updating them
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+
+        for(int i = 0; i < towerList.size(); i++){
+            towerList.get(i).render(shapeRenderer);
+        }
 
         //Spawns a new enemy every 40 renders
         if(renderCount % 40 == 0) {
@@ -111,5 +127,46 @@ public class GameScreen implements Screen {
     public void dispose() {
         tiledMap.dispose();
         shapeRenderer.dispose();
+    }
+
+    @Override
+    public boolean keyDown(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyUp(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyTyped(char character) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        towerList.add(new Tower(Tower.towerType.ROCK, screenX, screenY));
+        return false;
+    }
+
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+        return false;
+    }
+
+    @Override
+    public boolean mouseMoved(int screenX, int screenY) {
+        return false;
+    }
+
+    @Override
+    public boolean scrolled(int amount) {
+        return false;
     }
 }
