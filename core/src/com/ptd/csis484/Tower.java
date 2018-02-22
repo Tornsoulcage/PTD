@@ -31,7 +31,7 @@ public class Tower {
         cellX = MathUtils.floor(cellX);
         cellY = MathUtils.floor(cellY);
 
-        this.position = new Vector2(cellX*tileWidth, cellY*tileHeight);
+        this.position = new Vector2(cellX*tileWidth + tileWidth/2, (deviceHeight - 1 - cellY*tileHeight) - tileHeight/2);
 
         if(this.type == towerType.ROCK)
             damage = 3;
