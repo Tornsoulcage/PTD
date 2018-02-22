@@ -1,20 +1,18 @@
 package com.ptd.csis484;
 
-import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +43,7 @@ public class GameScreen implements Screen, InputProcessor {
     int renderCount = 0;
 
     List<Tower> towerList = new ArrayList<Tower>();
+    List<Bullet> bulletList = new ArrayList<Bullet>();
 
     //Creating the Screen and rendering a test map
     public GameScreen(final PTD game) {
@@ -79,7 +78,15 @@ public class GameScreen implements Screen, InputProcessor {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
         for(int i = 0; i < towerList.size(); i++){
+            towerList.get(i).update(enemyList, delta);
             towerList.get(i).render(shapeRenderer);
+            if(renderCount % 30 == 0)
+                bulletList.add(new Bullet(towerList.get(i).damage, towerList.get(i).target, towerList.get(i)));
+        }
+
+        for(int i = 0; i < bulletList.size(); i++){
+            bulletList.get(i).update(delta);
+            bulletList.get(i).render(shapeRenderer);
         }
 
         //Spawns a new enemy every 40 renders
