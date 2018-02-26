@@ -101,8 +101,12 @@ public class GameScreen implements Screen, InputProcessor {
 
         //Update loop for all of the enemies
         for(int i = 0; i < enemyList.size(); i++){
-            enemyList.get(i).update(delta);
-            enemyList.get(i).render(shapeRenderer);
+            enemyList.get(i).update(delta, bulletList);
+            if(enemyList.get(i).health <= 0) {
+                enemyList.remove(i);
+            } else {
+                enemyList.get(i).render(shapeRenderer);
+            }
         }
         shapeRenderer.end();
     }

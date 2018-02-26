@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
+import java.util.List;
+
 /**
  * Created by scott on 2/19/2018.
  */
@@ -20,6 +22,7 @@ public class Enemy {
     Vector2 position;
     Boolean waypointPassed[] = new Boolean[7];
     Vector2 waypointTiles[] = new Vector2[7];
+    Vector2 waypointStart = new Vector2();
 
     //There are only three types of enemies
     //These determine what values go into the above variables
@@ -54,7 +57,11 @@ public class Enemy {
         }
 
         //This is where the start tile currently is
-        position = new Vector2(0, tileHeight*3 - tileHeight/2);
+        waypointStart.x = 0;
+        waypointStart.y = tileHeight*3 - tileHeight/2;
+
+        //Setting position equal to the start tile
+        position = new Vector2(waypointStart.x, waypointStart.y);
 
         //Set every waypoint to false
         for(int i = 0; i < waypointPassed.length; i++){
@@ -79,7 +86,17 @@ public class Enemy {
     }
 
     //Moves the enemy around the map
-    public void update(float delta) {
+    public void update(float delta, List<Bullet> bulletList) {
+        //Checks to see if this enemy was hit by a bullet
+        for(int i = 0; i < bulletList.size(); i++){
+            if((bulletList.get(i).position.x <= this.position.x + 16) && bulletList.get(i).position.x >= this.position.x){
+                if((bulletList.get(i).position.y <= this.position.y + 16) && (bulletList.get(i).position.y >= this.position.y)){
+                    this.health -= bulletList.get(i).damage;
+                    bulletList.remove(i);
+                }
+            }
+        }
+
         //Each if statement checks if the enemy is between the next waypoint and the previous one
         //If they are we move the enemy in the proper direction until they hit the next waypoint
         //Then we change that point to passed/true and repeat.

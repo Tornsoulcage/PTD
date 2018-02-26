@@ -80,7 +80,7 @@ public class Tower {
                 targetXDist = Math.abs((position.x - target.position.x));
                 targetYDist = Math.abs((position.y - target.position.y));
                 targetDist = Math.sqrt((targetXDist * targetXDist + targetYDist * targetYDist));
-                
+
                 //Gets the distance to the potential target
                 targetXDist = Math.abs((position.x - enemyList.get(i).position.x));
                 targetYDist = Math.abs((position.y - enemyList.get(i).position.y));

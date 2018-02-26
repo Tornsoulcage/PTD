@@ -26,14 +26,16 @@ public class Bullet {
         renderer.rect(position.x, position.y, 10,10);
     }
 
-    public void update(float delta){
-        if(target.position.x > position.x)
-            position.x = position.x + 10;
-        if(target.position.x < position.x)
-            position.x = position.x - 10;
-        if(target.position.y > position.y)
-            position.y = position.y + 10;
-        if(target.position.y < position.y)
-            position.y = position.y - 10;
+    public void update(float delta) {
+        for (int i = 0; i < 10; i++) {
+            if (target.position.x > position.x)
+                position.x++;
+            if (target.position.x < position.x)
+                position.x--;
+            if (target.position.y > position.y)
+                position.y++;
+            if (target.position.y < position.y)
+                position.y--;
+        }
     }
 }
