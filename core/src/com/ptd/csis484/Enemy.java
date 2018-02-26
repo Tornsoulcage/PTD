@@ -17,6 +17,7 @@ public class Enemy {
     int damage;
     int speed;
     int health;
+    boolean destroyed;
 
     //Used to track the enemy's position and which waypoints have been passed
     Vector2 position;
@@ -62,6 +63,9 @@ public class Enemy {
 
         //Setting position equal to the start tile
         position = new Vector2(waypointStart.x, waypointStart.y);
+
+        //Marking the enemy undestroyed
+        destroyed = false;
 
         //Set every waypoint to false
         for(int i = 0; i < waypointPassed.length; i++){

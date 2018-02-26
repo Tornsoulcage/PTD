@@ -84,11 +84,6 @@ public class GameScreen implements Screen, InputProcessor {
                 bulletList.add(new Bullet(towerList.get(i).damage, towerList.get(i).target, towerList.get(i)));
         }
 
-        for(int i = 0; i < bulletList.size(); i++){
-            bulletList.get(i).update(delta);
-            bulletList.get(i).render(shapeRenderer);
-        }
-
         //Spawns a new enemy every 40 renders
         if(renderCount % 40 == 0) {
             //Wave size is 20 enemies so we stop once we get there
@@ -103,11 +98,21 @@ public class GameScreen implements Screen, InputProcessor {
         for(int i = 0; i < enemyList.size(); i++){
             enemyList.get(i).update(delta, bulletList);
             if(enemyList.get(i).health <= 0) {
+                enemyList.get(i).destroyed = true;
                 enemyList.remove(i);
             } else {
                 enemyList.get(i).render(shapeRenderer);
             }
         }
+
+        for(int i = 0; i < bulletList.size(); i++){
+            bulletList.get(i).update(delta);
+            if(bulletList.get(i).target.destroyed)
+                bulletList.remove(i);
+            else
+                bulletList.get(i).render(shapeRenderer);
+        }
+
         shapeRenderer.end();
     }
 
