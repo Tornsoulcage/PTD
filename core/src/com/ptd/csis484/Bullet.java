@@ -28,12 +28,12 @@ public class Bullet {
 
     public void update(float delta){
         if(target.position.x > position.x)
-            position.x++;
+            position.x = position.x + 10;
         if(target.position.x < position.x)
-            position.x--;
+            position.x = position.x - 10;
         if(target.position.y > position.y)
-            position.y++;
+            position.y = position.y + 10;
         if(target.position.y < position.y)
-            position.y--;
+            position.y = position.y - 10;
     }
 }

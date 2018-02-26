@@ -22,8 +22,8 @@ public class Tower {
     float tileHeight = deviceHeight/10;
     float tileWidth = deviceWidth/15;
 
-    //This Towers target
-    Enemy target;
+    //Sets a default enemy to be the target
+    Enemy target = new Enemy(Enemy.enemyType.ROCK);
 
     //Variables to help find the closet enemy
     double targetXDist;
@@ -68,16 +68,28 @@ public class Tower {
         renderer.rect(position.x, position.y, 20,20);
     }
 
-    public void update(List<Enemy> enemyList, float delta){
+    //Updates the tower to get a new target
+    public void update(List<Enemy> enemyList, float delta) {
+        //Variable to hold temp distance for each enemy
         double newTargetDist;
-        for(int i = 0; i < enemyList.size(); i++){
-            targetXDist = Math.abs((position.x - enemyList.get(i).position.x));
-            targetYDist = Math.abs((position.y - enemyList.get(i).position.y));
-            newTargetDist = Math.sqrt((targetXDist*targetXDist + targetYDist*targetYDist));
+        //Only runs if there is a enemy
+        if (!enemyList.isEmpty()) {
+            //Loops through the enemy list
+            for (int i = 0; i < enemyList.size(); i++) {
+                //Gets the current distance to the target
+                targetXDist = Math.abs((position.x - target.position.x));
+                targetYDist = Math.abs((position.y - target.position.y));
+                targetDist = Math.sqrt((targetXDist * targetXDist + targetYDist * targetYDist));
+                
+                //Gets the distance to the potential target
+                targetXDist = Math.abs((position.x - enemyList.get(i).position.x));
+                targetYDist = Math.abs((position.y - enemyList.get(i).position.y));
+                newTargetDist = Math.sqrt((targetXDist * targetXDist + targetYDist * targetYDist));
 
-            if(newTargetDist < targetDist) {
-                target = enemyList.get(i);
-                targetDist = newTargetDist;
+                //If potential is less than actual we change targets
+                if (newTargetDist < targetDist) {
+                    target = enemyList.get(i);
+                }
             }
         }
     }
