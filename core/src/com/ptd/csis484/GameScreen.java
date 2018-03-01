@@ -17,6 +17,14 @@ import com.badlogic.gdx.math.MathUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO Add popup to ask for tower type when user taps on the map
+//TODO Vary enemy types that spawn
+//TODO Add experience reward on enemy death
+//TODO Add gold reward on enemy death
+//TODO Add Gold cost to create a tower
+//TODO Add abillity to level towers up
+//TODO Add abillity to save user progress
+//TODO Add procedural generated maps
 
 /**
  * Created by scott on 2/18/2018.
