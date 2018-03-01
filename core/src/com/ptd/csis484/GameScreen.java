@@ -128,7 +128,13 @@ public class GameScreen implements Screen, InputProcessor {
                 bulletList.get(i).changeTarget();
             }
 
-            bulletList.get(i).render(shapeRenderer);
+            //If our bullet is sitting at the start position we remove it
+            if(bulletList.get(i).position.x == bulletList.get(i).target.waypointStart.x &&
+                    bulletList.get(i).position.y == bulletList.get(i).target.waypointStart.y){
+                bulletList.remove(i);
+            } else {
+                bulletList.get(i).render(shapeRenderer);
+            }
         }
 
         //If all of our enemies have been destroyed and we've reached the end of the wave we remove all of our bullets
