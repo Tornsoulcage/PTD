@@ -13,11 +13,20 @@ public class Bullet {
     int damage;
     Enemy target;
     Vector2 position;
+    Tower source;
 
     public Bullet(int dam, Enemy target, Tower source){
+        this.source = source;
         this.damage = source.damage;
         this.target = target;
+
         this.position = new Vector2(source.position.x, source.position.y);
+    }
+
+    //Updates the bullets target to it's source's current target
+    public void changeTarget(){
+        this.target = source.target;
+        Gdx.app.log("target: ", "" + this.target);
     }
 
     public void render(ShapeRenderer renderer){

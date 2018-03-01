@@ -76,6 +76,11 @@ public class Tower {
         if (!enemyList.isEmpty()) {
             //Loops through the enemy list
             for (int i = 0; i < enemyList.size(); i++) {
+                //If our target has been destroyed we switch to the default target
+                if(target.destroyed == true){
+                    this.target = new Enemy(Enemy.enemyType.ROCK);
+                }
+
                 //Gets the current distance to the target
                 targetXDist = Math.abs((position.x - target.position.x));
                 targetYDist = Math.abs((position.y - target.position.y));
@@ -91,6 +96,8 @@ public class Tower {
                     target = enemyList.get(i);
                 }
             }
+        } else {
+            this.target = new Enemy(Enemy.enemyType.ROCK);
         }
     }
 }
