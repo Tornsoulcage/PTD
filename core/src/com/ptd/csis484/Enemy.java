@@ -75,6 +75,8 @@ public class Enemy {
             waypointPassed[i] = false;
         }
 
+        //TODO Control turns on waypoints so the enemy turns once they reach the interior/center point
+        //Maybe use the same technique here as the bullets and do a loop of increments up to the speed value
         //Sets the waypoints for the test map
         waypointTiles[0] = new Vector2(tileWidth*6 + tileWidth/2, tileHeight*3 - tileHeight/2);
         waypointTiles[1] = new Vector2(tileWidth*6 + tileWidth/2, tileHeight*7 - tileHeight/2);
@@ -120,45 +122,46 @@ public class Enemy {
         //If they are we move the enemy in the proper direction until they hit the next waypoint
         //Then we change that point to passed/true and repeat.
         if(!waypointPassed[0])
-            position.x++;
+            position.x += speed;
 
         if(position.x >= waypointTiles[0].x)
             waypointPassed[0] = true;
 
         if(waypointPassed[0] && !waypointPassed[1])
-            position.y++;
+            position.y += speed;
 
         if(position.y >= waypointTiles[1].y)
             waypointPassed[1] = true;
 
         if(waypointPassed[1] && !waypointPassed[2])
-            position.x++;
+            position.x += speed;
 
         if(position.x >= waypointTiles[2].x)
             waypointPassed[2] = true;
 
         if(waypointPassed[2] && !waypointPassed[3])
-            position.y--;
+            position.y -= speed;
 
         if(position.y <= waypointTiles[3].y)
             waypointPassed[3] = true;
 
         if(waypointPassed[3] && !waypointPassed[4])
-            position.x++;
+            position.x += speed;
 
         if(position.x >= waypointTiles[4].x)
             waypointPassed[4] = true;
 
         if(waypointPassed[4] && !waypointPassed[5])
-           position.y++;
+           position.y += speed;
 
         if(position.y >= waypointTiles[5].y)
             waypointPassed[5] = true;
 
         if(waypointPassed[5] && !waypointPassed[6])
-            position.x++;
+            position.x += speed;
 
-        if(position.x >= waypointTiles[6].x)
+        if(position.x >= waypointTiles[6].x) {
             waypointPassed[6] = true;
+        }
     }
 }

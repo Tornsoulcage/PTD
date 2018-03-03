@@ -119,7 +119,6 @@ public class GameScreen implements Screen, InputProcessor {
                     case 2: enemyList.add(new Enemy(Enemy.enemyType.SCISSORS, waveNumber));
                             break;
                 }
-                Gdx.app.log("switch: ", "# " + enemyToSpawn);
                 enemyCount++;
             }
         }
@@ -130,13 +129,21 @@ public class GameScreen implements Screen, InputProcessor {
             //Checks if any bullets have hit this enemy and responds accordingly
             enemyList.get(i).update(delta, bulletList);
 
-            //If the enemy has taken enough damage we remove it and mark the enemy object has destroyed
-            if(enemyList.get(i).health <= 0) {
+            //If our enemy leaves the bounds of the screen we remove it from the game
+            //TODO add penalty for this occurring
+            if(enemyList.get(i).position.x > deviceWidth || enemyList.get(i).position.x < 0 ||
+                    enemyList.get(i).position.y > deviceHeight || enemyList.get(i).position.y < 0){
+                enemyList.remove(i);
+            } else if(enemyList.get(i).health <= 0) {
                 enemyList.get(i).destroyed = true;
                 enemyList.remove(i);
             } else {
                 enemyList.get(i).render(shapeRenderer);
             }
+            //If the enemy has taken enough damage we remove it and mark the enemy object has destroyed
+
+
+
         }
 
             //Update loop for all of the bullets
