@@ -87,9 +87,21 @@ public class Enemy {
 
     //Creates the enemy and places it
     public void render(ShapeRenderer renderer){
-        renderer.setColor(Color.BLACK);
-        renderer.set(ShapeRenderer.ShapeType.Filled);
-        renderer.rect(position.x, position.y, 16,16);
+        if(this.type == enemyType.ROCK) {
+            renderer.setColor(Color.BLACK);
+            renderer.set(ShapeRenderer.ShapeType.Filled);
+            renderer.rect(position.x - tileHeight/2, position.y, 16, 16);
+        }
+        if(this.type == enemyType.PAPER){
+            renderer.setColor(Color.BLACK);
+            renderer.set(ShapeRenderer.ShapeType.Filled);
+            renderer.rect(position.x, position.y, 16, tileHeight);
+        }
+        if(this.type == enemyType.SCISSORS){
+            renderer.setColor(Color.BLACK);
+            renderer.set(ShapeRenderer.ShapeType.Filled);
+            renderer.circle(position.x, position.y, 16);
+        }
     }
 
     //Moves the enemy around the map

@@ -26,7 +26,6 @@ public class Bullet {
     //Updates the bullets target to it's source's current target
     public void changeTarget(){
         this.target = source.target;
-        Gdx.app.log("target: ", "" + this.target);
     }
 
     public void render(ShapeRenderer renderer){

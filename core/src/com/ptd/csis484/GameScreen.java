@@ -110,7 +110,16 @@ public class GameScreen implements Screen, InputProcessor {
         if (renderCount % 40 == 0) {
             //Wave size is 20 enemies so we stop once we get there
             if (enemyCount != 20) {
-                enemyList.add(new Enemy(Enemy.enemyType.ROCK, waveNumber));
+                double enemyToSpawn = Math.random() * 3;
+                switch ((int) enemyToSpawn) {
+                    case 0: enemyList.add(new Enemy(Enemy.enemyType.ROCK, waveNumber));
+                            break;
+                    case 1: enemyList.add(new Enemy(Enemy.enemyType.PAPER, waveNumber));
+                            break;
+                    case 2: enemyList.add(new Enemy(Enemy.enemyType.SCISSORS, waveNumber));
+                            break;
+                }
+                Gdx.app.log("switch: ", "# " + enemyToSpawn);
                 enemyCount++;
             }
         }
