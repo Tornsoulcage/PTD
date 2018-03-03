@@ -14,10 +14,11 @@ import java.util.List;
 //Class representing the three types of enemies
 public class Enemy {
     //Variables for the enemies
-    int damage;
-    int speed;
-    int health;
+    double damage;
+    double speed;
+    double health;
     boolean destroyed;
+    double waveScale = 1;
 
     //Used to track the enemy's position and which waypoints have been passed
     Vector2 position;
@@ -36,24 +37,26 @@ public class Enemy {
     float tileHeight = deviceHeight/10;
     float tileWidth = deviceWidth/15;
 
-    public Enemy(enemyType type){
+    public Enemy(enemyType type, int wave){
         //Different values are passed depending on the enemy type
+        waveScale = wave * 1.15;
+
         if(type == enemyType.ROCK) {
-            this.damage = 5;
-            this.speed = 3;
-            this.health = 5;
+            this.damage = 5 * waveScale;
+            this.speed = 3* waveScale;
+            this.health = 5* waveScale;
             this.type = type;
         }
         if(type == enemyType.SCISSORS){
-            this.damage = 1;
-            this.speed = 5;
-            this.health = 3;
+            this.damage = 1* waveScale;
+            this.speed = 5* waveScale;
+            this.health = 3* waveScale;
             this.type = type;
         }
         if(type == enemyType.PAPER){
-            this.damage = 3;
-            this.speed = 3;
-            this.health = 3;
+            this.damage = 3* waveScale;
+            this.speed = 3* waveScale;
+            this.health = 3* waveScale;
             this.type = type;
         }
 

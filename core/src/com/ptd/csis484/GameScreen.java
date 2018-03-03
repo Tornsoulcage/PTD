@@ -22,8 +22,8 @@ import java.util.List;
 //TODO Add experience reward on enemy death
 //TODO Add gold reward on enemy death
 //TODO Add Gold cost to create a tower
-//TODO Add abillity to level towers up
-//TODO Add abillity to save user progress
+//TODO Add ability to level towers up
+//TODO Add ability to save user progress
 //TODO Add procedural generated maps
 
 /**
@@ -49,6 +49,9 @@ public class GameScreen implements Screen, InputProcessor {
     //List to keep track of enemies and a count of how many have been spawned
     List<Enemy> enemyList = new ArrayList<Enemy>();
     int enemyCount = 0;
+
+    //Keeps track of the wave number
+    int waveNumber = 1;
 
     //Lists to keep track of towers and bullets
     List<Tower> towerList = new ArrayList<Tower>();
@@ -80,7 +83,7 @@ public class GameScreen implements Screen, InputProcessor {
     //The "game loop"
     @Override
     public void render(float delta){
-        Gdx.gl.glClearColor(0,0,0.2f,1);
+        Gdx.gl.glClearColor(0, 0, 0.2f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         camera.update();
@@ -91,12 +94,12 @@ public class GameScreen implements Screen, InputProcessor {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
         //Looping through the towers and updating and drawing them
-        for(int i = 0; i < towerList.size(); i++) {
+        for (int i = 0; i < towerList.size(); i++) {
             towerList.get(i).update(enemyList, delta);
             towerList.get(i).render(shapeRenderer);
 
             //Every 30 renders wo spawn a new bullet, about 2 times a second
-            if (renderCount % 30 == 0){
+            if (renderCount % 30 == 0) {
                 if (!enemyList.isEmpty()) {
                     bulletList.add(new Bullet(towerList.get(i).damage, towerList.get(i).target, towerList.get(i)));
                 }
@@ -104,16 +107,16 @@ public class GameScreen implements Screen, InputProcessor {
         }
 
         //Spawns a new enemy every 40 renders
-        if(renderCount % 40 == 0) {
+        if (renderCount % 40 == 0) {
             //Wave size is 20 enemies so we stop once we get there
-            if(enemyCount != 20) {
-                enemyList.add(new Enemy(Enemy.enemyType.ROCK));
+            if (enemyCount != 20) {
+                enemyList.add(new Enemy(Enemy.enemyType.ROCK, waveNumber));
                 enemyCount++;
             }
         }
 
-        //Update loop for all of the enemies
-        for(int i = 0; i < enemyList.size(); i++){
+            //Update loop for all of the enemies
+        for (int i = 0; i < enemyList.size(); i++) {
             //Updates the enemies with the current list of bullets
             //Checks if any bullets have hit this enemy and responds accordingly
             enemyList.get(i).update(delta, bulletList);
@@ -127,18 +130,18 @@ public class GameScreen implements Screen, InputProcessor {
             }
         }
 
-        //Update loop for all of the bullets
-        for(int i = 0; i < bulletList.size(); i++){
+            //Update loop for all of the bullets
+        for (int i = 0; i < bulletList.size(); i++) {
             bulletList.get(i).update(delta);
 
-            //If our target has been destroyed we change targets
-            if(bulletList.get(i).target.destroyed) {
+                //If our target has been destroyed we change targets
+            if (bulletList.get(i).target.destroyed) {
                 bulletList.get(i).changeTarget();
             }
 
             //If our bullet is sitting at the start position we remove it
-            if(bulletList.get(i).position.x == bulletList.get(i).target.waypointStart.x &&
-                    bulletList.get(i).position.y == bulletList.get(i).target.waypointStart.y){
+            if (bulletList.get(i).position.x == bulletList.get(i).target.waypointStart.x &&
+                    bulletList.get(i).position.y == bulletList.get(i).target.waypointStart.y) {
                 bulletList.remove(i);
             } else {
                 bulletList.get(i).render(shapeRenderer);
@@ -146,8 +149,10 @@ public class GameScreen implements Screen, InputProcessor {
         }
 
         //If all of our enemies have been destroyed and we've reached the end of the wave we remove all of our bullets
-        if(enemyList.isEmpty() && enemyCount == 20){
+        if (enemyList.isEmpty() && enemyCount == 20) {
             bulletList = new ArrayList<Bullet>();
+            waveNumber++;
+            enemyCount = 0;
         }
 
         //Incrementing the render count and ending the shape renderer

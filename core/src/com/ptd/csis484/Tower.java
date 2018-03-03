@@ -23,7 +23,7 @@ public class Tower {
     float tileWidth = deviceWidth/15;
 
     //Sets a default enemy to be the target
-    Enemy target = new Enemy(Enemy.enemyType.ROCK);
+    Enemy target = new Enemy(Enemy.enemyType.ROCK, 1);
 
     //Variables to help find the closet enemy
     double targetXDist;
@@ -78,7 +78,7 @@ public class Tower {
             for (int i = 0; i < enemyList.size(); i++) {
                 //If our target has been destroyed we switch to the default target
                 if(target.destroyed == true){
-                    this.target = new Enemy(Enemy.enemyType.ROCK);
+                    this.target = new Enemy(Enemy.enemyType.ROCK, 1);
                 }
 
                 //Gets the current distance to the target
@@ -97,7 +97,7 @@ public class Tower {
                 }
             }
         } else {
-            this.target = new Enemy(Enemy.enemyType.ROCK);
+            this.target = new Enemy(Enemy.enemyType.ROCK, 1);
         }
     }
 }
