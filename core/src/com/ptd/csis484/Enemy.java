@@ -3,8 +3,10 @@ package com.ptd.csis484;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -37,9 +39,13 @@ public class Enemy {
     float tileHeight = deviceHeight/10;
     float tileWidth = deviceWidth/15;
 
+    //Bounds of the enemy's rectangle
+    Rectangle bounds;
+
     public Enemy(enemyType type, int wave){
         //Different values are passed depending on the enemy type
-        waveScale = wave * 1.15;
+        //Enemies stats increase by one percent each wave
+        waveScale = wave * 1.01;
 
         if(type == enemyType.ROCK) {
             this.damage = 5 * waveScale;
@@ -66,6 +72,9 @@ public class Enemy {
 
         //Setting position equal to the start tile
         position = new Vector2(waypointStart.x, waypointStart.y);
+        //Setting our initial bounds
+        bounds = new Rectangle(position.x, position.y, 32, 32);
+
 
         //Marking the enemy undestroyed
         destroyed = false;
@@ -92,31 +101,35 @@ public class Enemy {
         if(this.type == enemyType.ROCK) {
             renderer.setColor(Color.BLACK);
             renderer.set(ShapeRenderer.ShapeType.Filled);
-            renderer.rect(position.x - tileHeight/2, position.y, 16, 16);
+            renderer.rect(position.x - tileHeight/2, position.y, 32, 32);
         }
         if(this.type == enemyType.PAPER){
-            renderer.setColor(Color.BLACK);
+            renderer.setColor(Color.BLUE);
             renderer.set(ShapeRenderer.ShapeType.Filled);
-            renderer.rect(position.x, position.y, 16, tileHeight);
+            renderer.rect(position.x, position.y, 32, 32);
         }
         if(this.type == enemyType.SCISSORS){
-            renderer.setColor(Color.BLACK);
+            renderer.setColor(Color.RED);
             renderer.set(ShapeRenderer.ShapeType.Filled);
-            renderer.circle(position.x, position.y, 16);
+            renderer.rect(position.x - tileHeight/2, position.y, 32,32);
         }
     }
 
     //Moves the enemy around the map
     public void update(float delta, List<Bullet> bulletList) {
-        //Checks to see if this enemy was hit by a bullet
-        for(int i = 0; i < bulletList.size(); i++){
-            if((bulletList.get(i).position.x <= this.position.x + 16) && bulletList.get(i).position.x >= this.position.x){
-                if((bulletList.get(i).position.y <= this.position.y + 16) && (bulletList.get(i).position.y >= this.position.y)){
-                    this.health -= bulletList.get(i).damage;
-                    bulletList.remove(i);
-                }
+        //Updating the bounds for the enemy
+        bounds = new Rectangle(position.x, position.y, 32, 32);
+
+        //Iterating over the bullets to check for collisions
+        List<Bullet> toRemove = new ArrayList<Bullet>();
+        for (Bullet bullet : bulletList) {
+            if (this.bounds.overlaps(bullet.getBounds())) {
+                this.health -= bullet.damage;
+                toRemove.add(bullet);
             }
         }
+        //Removing all bullets that did collide
+        bulletList.removeAll(toRemove);
 
         //Each if statement checks if the enemy is between the next waypoint and the previous one
         //If they are we move the enemy in the proper direction until they hit the next waypoint
