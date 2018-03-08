@@ -1,42 +1,43 @@
 package com.ptd.csis484;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 /**
- * Created by Joseph Scott on 2/22/2018.
+ * Description: Represents the bullets fired from towers
+ *
+ * Created by Joseph A Scott on 2/22/2018.
  */
 
 public class Bullet {
-    int damage;
-    Enemy target;
-    Tower source;
-    int speed;
+    private int damage;
+    private Enemy target;
+    private Tower source;
+    private int speed;
 
     //Vectors to handle bullet motion
     //Unused vectors are staying in case we change the way we handle movement
-    Vector2 position = new Vector2();
-    Vector2 direction = new Vector2();
-    Vector2 velocity = new Vector2();
-    Vector2 targetPosition = new Vector2();
-    Vector2 movement = new Vector2();
+    private Vector2 position = new Vector2();
+    private Vector2 direction = new Vector2();
+    private Vector2 velocity = new Vector2();
+    private Vector2 targetPosition = new Vector2();
+    private Vector2 movement = new Vector2();
 
-    Rectangle bounds;
+    private Rectangle bounds;
 
     public Bullet(int dam, Enemy target, Tower source){
         this.source = source;
-        this.damage = source.damage;
+        this.damage = source.getDamage();
         this.target = target;
 
         //10 is the default speed for now
-        this.speed = 10;
+        this.speed = 20;
 
         //Updating our movement vectors
-        this.position = new Vector2(source.position.x, source.position.y);
-        this.targetPosition = new Vector2(target.position.x, target.position.y);
+        this.position = new Vector2(source.getPosition().x, source.getPosition().y);
+        this.targetPosition = new Vector2(target.getPosition().x, target.getPosition().y);
         direction.set(targetPosition).sub(position).nor();
 
         //Setting our initial bounds
@@ -45,7 +46,7 @@ public class Bullet {
 
     //Updates the bullets target to it's source's current target
     public void changeTarget(){
-        this.target = source.target;
+        this.target = source.getTarget();
     }
 
     public void render(ShapeRenderer renderer){

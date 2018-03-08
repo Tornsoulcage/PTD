@@ -12,8 +12,6 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
-
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,46 +25,54 @@ import java.util.List;
 //TODO Add procedural generated maps
 
 /**
- * Created by scott on 2/18/2018.
+ * Description: Runs the actual game
+ *
+ * Created by Joseph A Scott on 2/18/2018.
  */
 
 //Represents the Game Screen. Where we actually play the game
 public class GameScreen implements Screen, InputProcessor {
-    final PTD game;
-    OrthographicCamera camera;
+    private final PTD game;
+    private OrthographicCamera camera;
+
+    //Stats on the tile sizes for the map
+    private final int TILE_X_COUNT = 15;
+    private final int TILE_Y_COUNT = 10;
+    private final int TILE_SIDE_LENGTH = 32;
 
     //We use a tile map because it makes more sense with placing towers
-    TiledMap tiledMap;
-    TiledMapRenderer tiledMapRenderer;
-    ShapeRenderer shapeRenderer;
+    private TiledMap tiledMap;
+    private TiledMapRenderer tiledMapRenderer;
+    private ShapeRenderer shapeRenderer;
 
     //Gets the dimensions of the tiles
-    float deviceHeight = Gdx.graphics.getHeight();
-    float deviceWidth = Gdx.graphics.getWidth();
-    float tileHeight = deviceHeight/10;
-    float tileWidth = deviceWidth/15;
+    private float deviceHeight = Gdx.graphics.getHeight();
+    private float deviceWidth = Gdx.graphics.getWidth();
+    private float tileHeight = deviceHeight/TILE_Y_COUNT;
+    private float tileWidth = deviceWidth/TILE_X_COUNT;
 
     //List to keep track of enemies and a count of how many have been spawned
-    List<Enemy> enemyList = new ArrayList<Enemy>();
-    int enemyCount = 0;
+    private List<Enemy> enemyList = new ArrayList<Enemy>();
+    private int enemyCount = 0;
 
     //Keeps track of the wave number
-    int waveNumber = 1;
+    private int waveNumber = 1;
 
     //Lists to keep track of towers and bullets
-    List<Tower> towerList = new ArrayList<Tower>();
-    List<Bullet> bulletList = new ArrayList<Bullet>();
+    private List<Tower> towerList = new ArrayList<Tower>();
+    private List<Bullet> bulletList = new ArrayList<Bullet>();
 
     //Counts the number of times render has been called
     //Used to space out the spawning of enemies and bullets
-    int renderCount = 0;
+    private int renderCount = 0;
 
     //Creating the Screen and rendering a test map
     public GameScreen(final PTD game) {
         this.game = game;
-        int viewportWidth = 480;
-        int viewportHeight = 320;
 
+        //Size of the map
+        int viewportWidth = TILE_X_COUNT * TILE_SIDE_LENGTH;
+        int viewportHeight = TILE_Y_COUNT * TILE_SIDE_LENGTH;
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, viewportWidth, viewportHeight);
@@ -100,7 +106,7 @@ public class GameScreen implements Screen, InputProcessor {
             //Every 30 renders wo spawn a new bullet, about 2 times a second
             if (renderCount % 30 == 0) {
                 if (!enemyList.isEmpty()) {
-                    bulletList.add(new Bullet(towerList.get(i).damage, towerList.get(i).target, towerList.get(i)));
+                    bulletList.add(new Bullet(towerList.get(i).getDamage(), towerList.get(i).getTarget(), towerList.get(i)));
                 }
             }
         }
@@ -130,11 +136,11 @@ public class GameScreen implements Screen, InputProcessor {
 
             //If our enemy leaves the bounds of the screen we remove it from the game
             //TODO add penalty for this occurring
-            if(enemyList.get(i).position.x > deviceWidth || enemyList.get(i).position.x < 0 ||
-                    enemyList.get(i).position.y > deviceHeight || enemyList.get(i).position.y < 0){
+            if(enemyList.get(i).getPosition().x > deviceWidth || enemyList.get(i).getPosition().x < 0 ||
+                    enemyList.get(i).getPosition().y > deviceHeight || enemyList.get(i).getPosition().y < 0){
                 enemyList.remove(i);
-            } else if(enemyList.get(i).health <= 0) {
-                enemyList.get(i).destroyed = true;
+            } else if(enemyList.get(i).getHealth() <= 0) {
+                enemyList.get(i).setDestroyed(true);
                 enemyList.remove(i);
             } else {
                 enemyList.get(i).render(shapeRenderer);
@@ -150,13 +156,13 @@ public class GameScreen implements Screen, InputProcessor {
             bulletList.get(i).update(delta);
 
                 //If our target has been destroyed we change targets
-            if (bulletList.get(i).target.destroyed) {
+            if (bulletList.get(i).getTarget().isDestroyed()) {
                 bulletList.get(i).changeTarget();
             }
 
             //If our bullet is sitting at the start position we remove it
-            if (bulletList.get(i).position.x == bulletList.get(i).target.waypointStart.x &&
-                    bulletList.get(i).position.y == bulletList.get(i).target.waypointStart.y) {
+            if (bulletList.get(i).getPosition().x == bulletList.get(i).getTarget().getWaypointStart().x &&
+                    bulletList.get(i).getPosition().y == bulletList.get(i).getTarget().getWaypointStart().y) {
                 bulletList.remove(i);
             } else {
                 bulletList.get(i).render(shapeRenderer);
@@ -223,17 +229,22 @@ public class GameScreen implements Screen, InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        //Figuring our which spot on the grid the user tapped
         float cellX = screenX/tileWidth;
         float cellY = screenY/tileHeight;
         cellX = MathUtils.floor(cellX);
         cellY = MathUtils.floor(cellY);
 
+        //Getting the cell the user tapped and checking if it is a tower tile
         TiledMapTileLayer layer = (TiledMapTileLayer) tiledMap.getLayers().get(0);
         TiledMapTileLayer.Cell cell = layer.getCell((int) cellX, (int) (10 - 1 - cellY));
         Object property = cell.getTile().getProperties().get("TowerTile");
 
-        if(property != null)
+        //If it is a tower tile we spawn a new tower
+        //TODO add popup to allow user to pick a tower type
+        if(property != null) {
             towerList.add(new Tower(Tower.towerType.ROCK, cellX, cellY));
+        }
         return false;
     }
 

@@ -8,34 +8,37 @@ import com.badlogic.gdx.math.Vector2;
 import java.util.List;
 
 /**
- * Created by Joseph Scott on 2/22/2018.
+ * Description: Represents the tower objects
+ *
+ * Created by Joseph A Scott on 2/22/2018.
  */
 
 //Represents the tower objects
 public class Tower {
     //Damage each bullet does
-    int damage;
+    private int damage;
 
     //Variables used to help calculate position
-    float deviceHeight = Gdx.graphics.getHeight();
-    float deviceWidth = Gdx.graphics.getWidth();
-    float tileHeight = deviceHeight/10;
-    float tileWidth = deviceWidth/15;
+    private float deviceHeight = Gdx.graphics.getHeight();
+    private float deviceWidth = Gdx.graphics.getWidth();
+    private float tileHeight = deviceHeight/10;
+    private float tileWidth = deviceWidth/15;
 
     //Sets a default enemy to be the target
-    Enemy target = new Enemy(Enemy.enemyType.ROCK, 1);
+    private Enemy target = new Enemy(Enemy.enemyType.ROCK, 1);
 
     //Variables to help find the closet enemy
-    double targetXDist;
-    double targetYDist;
-    double targetDist;
+    private double targetXDist;
+    private double targetYDist;
+    private double targetDist;
 
     //Only three types of towers are allowed
     public enum towerType{ROCK, PAPER, SCISSORS};
-    towerType type;
+
+    private towerType type;
 
     //Towers position on map
-    Vector2 position;
+    private Vector2 position;
 
     //Main constructor, passes the desired type and it's location on the map
     public Tower(towerType type, float cellX, float cellY){
@@ -77,18 +80,18 @@ public class Tower {
             //Loops through the enemy list
             for (int i = 0; i < enemyList.size(); i++) {
                 //If our target has been destroyed we switch to the default target
-                if(target.destroyed == true){
+                if(target.isDestroyed()){
                     this.target = new Enemy(Enemy.enemyType.ROCK, 1);
                 }
 
                 //Gets the current distance to the target
-                targetXDist = Math.abs((position.x - target.position.x));
-                targetYDist = Math.abs((position.y - target.position.y));
+                targetXDist = Math.abs((position.x - target.getPosition().x));
+                targetYDist = Math.abs((position.y - target.getPosition().y));
                 targetDist = Math.sqrt((targetXDist * targetXDist + targetYDist * targetYDist));
 
                 //Gets the distance to the potential target
-                targetXDist = Math.abs((position.x - enemyList.get(i).position.x));
-                targetYDist = Math.abs((position.y - enemyList.get(i).position.y));
+                targetXDist = Math.abs((position.x - enemyList.get(i).getPosition().x));
+                targetYDist = Math.abs((position.y - enemyList.get(i).getPosition().y));
                 newTargetDist = Math.sqrt((targetXDist * targetXDist + targetYDist * targetYDist));
 
                 //If potential is less than actual we change targets
@@ -99,5 +102,93 @@ public class Tower {
         } else {
             this.target = new Enemy(Enemy.enemyType.ROCK, 1);
         }
+    }
+
+    public int getDamage() {
+        return damage;
+    }
+
+    public void setDamage(int damage) {
+        this.damage = damage;
+    }
+
+    public float getDeviceHeight() {
+        return deviceHeight;
+    }
+
+    public void setDeviceHeight(float deviceHeight) {
+        this.deviceHeight = deviceHeight;
+    }
+
+    public float getDeviceWidth() {
+        return deviceWidth;
+    }
+
+    public void setDeviceWidth(float deviceWidth) {
+        this.deviceWidth = deviceWidth;
+    }
+
+    public float getTileHeight() {
+        return tileHeight;
+    }
+
+    public void setTileHeight(float tileHeight) {
+        this.tileHeight = tileHeight;
+    }
+
+    public float getTileWidth() {
+        return tileWidth;
+    }
+
+    public void setTileWidth(float tileWidth) {
+        this.tileWidth = tileWidth;
+    }
+
+    public Enemy getTarget() {
+        return target;
+    }
+
+    public void setTarget(Enemy target) {
+        this.target = target;
+    }
+
+    public double getTargetXDist() {
+        return targetXDist;
+    }
+
+    public void setTargetXDist(double targetXDist) {
+        this.targetXDist = targetXDist;
+    }
+
+    public double getTargetYDist() {
+        return targetYDist;
+    }
+
+    public void setTargetYDist(double targetYDist) {
+        this.targetYDist = targetYDist;
+    }
+
+    public double getTargetDist() {
+        return targetDist;
+    }
+
+    public void setTargetDist(double targetDist) {
+        this.targetDist = targetDist;
+    }
+
+    public towerType getType() {
+        return type;
+    }
+
+    public void setType(towerType type) {
+        this.type = type;
+    }
+
+    public Vector2 getPosition() {
+        return position;
+    }
+
+    public void setPosition(Vector2 position) {
+        this.position = position;
     }
 }

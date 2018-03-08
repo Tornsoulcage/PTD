@@ -8,13 +8,16 @@ import com.badlogic.gdx.InputProcessor;
 
 
 /**
- * Created by scott on 2/18/2018.
+ * Description: Displays a main menu screen so the user isnt thrown
+ * into the game upon launching.
+ *
+ * Created by Joseph A Scott on 2/18/2018.
  */
 
 //Represents the Main Menu/Start Screen
 public class MainMenuScreen implements Screen, InputProcessor {
-    final PTD game;
-    OrthographicCamera camera;
+    private final PTD game;
+    private OrthographicCamera camera;
 
     //Setting the view to our map size
     public MainMenuScreen(final PTD game){
@@ -33,8 +36,11 @@ public class MainMenuScreen implements Screen, InputProcessor {
         game.batch.setProjectionMatrix(camera.combined);
 
         game.batch.begin();
+
+        //Drawing our welcome messages
         game.font.draw(game.batch, "Welcome to PTD.", 100, 200);
         game.font.draw(game.batch, "Tap anywhere to begin.", 100, 100);
+
         game.batch.end();
     }
 
@@ -90,6 +96,7 @@ public class MainMenuScreen implements Screen, InputProcessor {
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        //Changes the screen to the actual game upon taping
         game.setScreen(new GameScreen(game));
         dispose();
         return false;
