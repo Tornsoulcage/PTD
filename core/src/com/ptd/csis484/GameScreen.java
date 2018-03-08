@@ -12,6 +12,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +52,8 @@ public class GameScreen implements Screen, InputProcessor {
     private float tileHeight = deviceHeight/TILE_Y_COUNT;
     private float tileWidth = deviceWidth/TILE_X_COUNT;
 
+    private Rectangle gameBounds = new Rectangle(0,0, deviceWidth, deviceHeight);
+
     //List to keep track of enemies and a count of how many have been spawned
     private List<Enemy> enemyList = new ArrayList<Enemy>();
     private int enemyCount = 0;
@@ -87,7 +90,7 @@ public class GameScreen implements Screen, InputProcessor {
 
     //The "game loop"
     @Override
-    public void render(float delta){
+    public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0.2f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -99,14 +102,14 @@ public class GameScreen implements Screen, InputProcessor {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
         //Looping through the towers and updating and drawing them
-        for (int i = 0; i < towerList.size(); i++) {
-            towerList.get(i).update(enemyList, delta);
-            towerList.get(i).render(shapeRenderer);
+        for (Tower tower : towerList) {
+            tower.update(enemyList, delta);
+            tower.render(shapeRenderer);
 
             //Every 30 renders wo spawn a new bullet, about 2 times a second
             if (renderCount % 30 == 0) {
                 if (!enemyList.isEmpty()) {
-                    bulletList.add(new Bullet(towerList.get(i).getDamage(), towerList.get(i).getTarget(), towerList.get(i)));
+                    bulletList.add(new Bullet(tower.getDamage(), tower.getTarget(), tower));
                 }
             }
         }
@@ -132,46 +135,42 @@ public class GameScreen implements Screen, InputProcessor {
         }
 
         //Update loop for all of the enemies
-        for (int i = 0; i < enemyList.size(); i++) {
+        List<Enemy> toEnemyRemove = new ArrayList<Enemy>();
+        for (Enemy enemy : enemyList) {
             //Updates the enemies with the current list of bullets
-            //Checks if any bullets have hit this enemy and responds accordingly
-            enemyList.get(i).update(delta, bulletList);
+            enemy.update(delta, bulletList);
 
             //If our enemy leaves the bounds of the screen we remove it from the game
             //TODO add penalty for this occurring
-            if (enemyList.get(i).getPosition().x > deviceWidth || enemyList.get(i).getPosition().x < 0 ||
-                    enemyList.get(i).getPosition().y > deviceHeight || enemyList.get(i).getPosition().y < 0) {
-                enemyList.remove(i);
-            } else if (enemyList.get(i).getHealth() <= 0) {
-                enemyList.get(i).setDestroyed(true);
-                enemyList.remove(i);
-            } else {
-                enemyList.get(i).render(shapeRenderer);
+            if (!gameBounds.contains(enemy.getBounds())) {
+               toEnemyRemove.add(enemy);
+            } else if (enemy.getHealth() <= 0) {
+                enemy.setDestroyed(true);
+                toEnemyRemove.add(enemy);
             }
-            //If the enemy has taken enough damage we remove it and mark the enemy object has destroyed
+
+            enemy.render(shapeRenderer);
+
         }
+        enemyList.removeAll(toEnemyRemove);
 
         //Update loop for all of the bullets
-        for (int i = 0; i < bulletList.size(); i++) {
-            bulletList.get(i).update(delta);
+        List<Bullet> toBulletRemove = new ArrayList<Bullet>();
+        for (Bullet bullet : bulletList) {
+            bullet.update(delta);
 
-            //If our target has been destroyed we change targets
-            if (bulletList.get(i).getTarget().isDestroyed()) {
-                bulletList.get(i).changeTarget();
+            //If our bullet is out of bounds
+            if (!gameBounds.contains(bullet.getBounds())) {
+                toBulletRemove.add(bullet);
             }
 
-            //If our bullet is sitting at the start position we remove it
-            if (bulletList.get(i).getPosition().x == bulletList.get(i).getTarget().getWaypointStart().x &&
-                    bulletList.get(i).getPosition().y == bulletList.get(i).getTarget().getWaypointStart().y) {
-                bulletList.remove(i);
-            } else {
-                bulletList.get(i).render(shapeRenderer);
-            }
+            bullet.render(shapeRenderer);
+
         }
+        bulletList.removeAll(toBulletRemove);
 
         //If all of our enemies have been destroyed and we've reached the end of the wave we remove all of our bullets
         if (enemyList.isEmpty() && enemyCount == 20) {
-            bulletList = new ArrayList<Bullet>();
             waveNumber++;
             enemyCount = 0;
         }
@@ -180,7 +179,6 @@ public class GameScreen implements Screen, InputProcessor {
         renderCount++;
         shapeRenderer.end();
     }
-
     @Override
     public void show() {
         Gdx.input.setInputProcessor(this);

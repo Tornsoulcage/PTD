@@ -44,11 +44,6 @@ public class Bullet {
         bounds = new Rectangle(position.x, position.y, 10,10);
     }
 
-    //Updates the bullets target to it's source's current target
-    public void changeTarget(){
-        this.target = source.getTarget();
-    }
-
     public void render(ShapeRenderer renderer){
         renderer.setColor(Color.GREEN);
         renderer.set(ShapeRenderer.ShapeType.Filled);

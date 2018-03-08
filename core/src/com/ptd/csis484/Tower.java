@@ -90,7 +90,7 @@ public class Tower {
         //Only runs if there is a enemy
         if (!enemyList.isEmpty()) {
             //Loops through the enemy list
-            for (int i = 0; i < enemyList.size(); i++) {
+            for (Enemy enemy : enemyList) {
                 //If our target has been destroyed we switch to the default target
                 if(target.isDestroyed()){
                     this.target = new Enemy(Enemy.enemyType.ROCK, 1);
@@ -102,13 +102,13 @@ public class Tower {
                 targetDist = Math.sqrt((targetXDist * targetXDist + targetYDist * targetYDist));
 
                 //Gets the distance to the potential target
-                targetXDist = Math.abs((position.x - enemyList.get(i).getPosition().x));
-                targetYDist = Math.abs((position.y - enemyList.get(i).getPosition().y));
+                targetXDist = Math.abs((position.x - enemy.getPosition().x));
+                targetYDist = Math.abs((position.y - enemy.getPosition().y));
                 newTargetDist = Math.sqrt((targetXDist * targetXDist + targetYDist * targetYDist));
 
                 //If potential is less than actual we change targets
                 if (newTargetDist < targetDist) {
-                    target = enemyList.get(i);
+                    target = enemy;
                 }
             }
         } else {
