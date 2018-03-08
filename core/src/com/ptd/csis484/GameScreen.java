@@ -77,7 +77,6 @@ public class GameScreen implements Screen, InputProcessor {
 
         //Shape Renderer is how we draw the enemies
         shapeRenderer = new ShapeRenderer();
-        Gdx.input.setInputProcessor(this);
     }
 
     //The "game loop"
@@ -178,7 +177,7 @@ public class GameScreen implements Screen, InputProcessor {
 
     @Override
     public void show() {
-
+        Gdx.input.setInputProcessor(this);
     }
 
     @Override
@@ -198,7 +197,7 @@ public class GameScreen implements Screen, InputProcessor {
 
     @Override
     public void hide() {
-
+        Gdx.input.setInputProcessor(null);
     }
 
     @Override
