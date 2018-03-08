@@ -17,16 +17,21 @@ import java.util.List;
 public class Enemy {
     //Variables for the enemies
     double damage;
-    double speed;
+    float speed;
     double health;
     boolean destroyed;
-    double waveScale = 1;
+    float waveScale = 1;
+    int currentWaypoint = 0;
 
     //Used to track the enemy's position and which waypoints have been passed
-    Vector2 position;
-    Boolean waypointPassed[] = new Boolean[7];
-    Vector2 waypointTiles[] = new Vector2[7];
+    Vector2 position = new Vector2();
     Vector2 waypointStart = new Vector2();
+
+    List<Rectangle> waypointBounds = new ArrayList<Rectangle>();
+
+    Vector2 direction = new Vector2();
+    Vector2 velocity = new Vector2();
+    Vector2 targetPosition = new Vector2();
 
     //There are only three types of enemies
     //These determine what values go into the above variables
@@ -45,11 +50,11 @@ public class Enemy {
     public Enemy(enemyType type, int wave){
         //Different values are passed depending on the enemy type
         //Enemies stats increase by one percent each wave
-        waveScale = wave * 1.01;
+        waveScale = (float)(wave * 1.01);
 
         if(type == enemyType.ROCK) {
             this.damage = 5 * waveScale;
-            this.speed = 3* waveScale;
+            this.speed = 3 * waveScale;
             this.health = 5* waveScale;
             this.type = type;
         }
@@ -72,6 +77,7 @@ public class Enemy {
 
         //Setting position equal to the start tile
         position = new Vector2(waypointStart.x, waypointStart.y);
+
         //Setting our initial bounds
         bounds = new Rectangle(position.x, position.y, 32, 32);
 
@@ -79,21 +85,14 @@ public class Enemy {
         //Marking the enemy undestroyed
         destroyed = false;
 
-        //Set every waypoint to false
-        for(int i = 0; i < waypointPassed.length; i++){
-            waypointPassed[i] = false;
-        }
-
-        //TODO Control turns on waypoints so the enemy turns once they reach the interior/center point
-        //Maybe use the same technique here as the bullets and do a loop of increments up to the speed value
-        //Sets the waypoints for the test map
-        waypointTiles[0] = new Vector2(tileWidth*6 + tileWidth/2, tileHeight*3 - tileHeight/2);
-        waypointTiles[1] = new Vector2(tileWidth*6 + tileWidth/2, tileHeight*7 - tileHeight/2);
-        waypointTiles[2] = new Vector2(tileWidth*10 + tileWidth/2, tileHeight*7 - tileHeight/2);
-        waypointTiles[3] = new Vector2(tileWidth*10 + tileWidth/2, tileHeight*2 - tileHeight/2);
-        waypointTiles[4] = new Vector2(tileWidth*13 + tileWidth/2, tileHeight*2 - tileHeight/2);
-        waypointTiles[5] = new Vector2(tileWidth*13 + tileWidth/2, tileHeight*9 - tileHeight/2);
-        waypointTiles[6] = new Vector2(tileWidth*15 + tileWidth/2, tileHeight*9 - tileHeight/2);
+        //Setting our waypoints for the test map
+        waypointBounds.add(new Rectangle(tileWidth*6 + tileWidth/3, tileHeight*2 + tileHeight/3, tileWidth/3 , tileHeight/3));
+        waypointBounds.add(new Rectangle(tileWidth*6 + tileWidth/3, tileHeight*6 + tileHeight/3, tileWidth/3, tileHeight/3));
+        waypointBounds.add(new Rectangle(tileWidth*10 + tileWidth/3, tileHeight*6 + tileHeight/3, tileWidth/3, tileHeight/3));
+        waypointBounds.add(new Rectangle(tileWidth*10 + tileWidth/3, tileHeight*1 + tileHeight/3, tileWidth/3, tileHeight/3));
+        waypointBounds.add(new Rectangle(tileWidth*13 + tileWidth/3, tileHeight*1 + tileHeight/3, tileWidth/3, tileHeight/3));
+        waypointBounds.add(new Rectangle(tileWidth*13 + tileWidth/3, tileHeight*8 + tileHeight/3, tileWidth/3, tileHeight/3));
+        waypointBounds.add(new Rectangle(tileWidth*15 + tileWidth/3, tileHeight*8 + tileHeight/3, tileWidth/3, tileHeight/3));
     }
 
     //Creates the enemy and places it
@@ -101,7 +100,7 @@ public class Enemy {
         if(this.type == enemyType.ROCK) {
             renderer.setColor(Color.BLACK);
             renderer.set(ShapeRenderer.ShapeType.Filled);
-            renderer.rect(position.x - tileHeight/2, position.y, 32, 32);
+            renderer.rect(position.x, position.y, 32, 32);
         }
         if(this.type == enemyType.PAPER){
             renderer.setColor(Color.BLUE);
@@ -111,15 +110,12 @@ public class Enemy {
         if(this.type == enemyType.SCISSORS){
             renderer.setColor(Color.RED);
             renderer.set(ShapeRenderer.ShapeType.Filled);
-            renderer.rect(position.x - tileHeight/2, position.y, 32,32);
+            renderer.rect(position.x, position.y, 32,32);
         }
     }
 
     //Moves the enemy around the map
     public void update(float delta, List<Bullet> bulletList) {
-        //Updating the bounds for the enemy
-        bounds = new Rectangle(position.x, position.y, 32, 32);
-
         //Iterating over the bullets to check for collisions
         List<Bullet> toRemove = new ArrayList<Bullet>();
         for (Bullet bullet : bulletList) {
@@ -131,50 +127,19 @@ public class Enemy {
         //Removing all bullets that did collide
         bulletList.removeAll(toRemove);
 
-        //Each if statement checks if the enemy is between the next waypoint and the previous one
-        //If they are we move the enemy in the proper direction until they hit the next waypoint
-        //Then we change that point to passed/true and repeat.
-        if(!waypointPassed[0])
-            position.x += speed;
+        //Setting our movement vectors
+        this.targetPosition = new Vector2(waypointBounds.get(currentWaypoint).getX(), waypointBounds.get(currentWaypoint).getY());
+        this.direction.set(targetPosition).sub(position).nor();
+        velocity.set(direction).scl(this.speed);
 
-        if(position.x >= waypointTiles[0].x)
-            waypointPassed[0] = true;
+        position.add(velocity);
 
-        if(waypointPassed[0] && !waypointPassed[1])
-            position.y += speed;
+        //Updating the bounds for the enemy
+        bounds = new Rectangle(position.x, position.y, 32, 32);
 
-        if(position.y >= waypointTiles[1].y)
-            waypointPassed[1] = true;
-
-        if(waypointPassed[1] && !waypointPassed[2])
-            position.x += speed;
-
-        if(position.x >= waypointTiles[2].x)
-            waypointPassed[2] = true;
-
-        if(waypointPassed[2] && !waypointPassed[3])
-            position.y -= speed;
-
-        if(position.y <= waypointTiles[3].y)
-            waypointPassed[3] = true;
-
-        if(waypointPassed[3] && !waypointPassed[4])
-            position.x += speed;
-
-        if(position.x >= waypointTiles[4].x)
-            waypointPassed[4] = true;
-
-        if(waypointPassed[4] && !waypointPassed[5])
-           position.y += speed;
-
-        if(position.y >= waypointTiles[5].y)
-            waypointPassed[5] = true;
-
-        if(waypointPassed[5] && !waypointPassed[6])
-            position.x += speed;
-
-        if(position.x >= waypointTiles[6].x) {
-            waypointPassed[6] = true;
+        //If the enemey crosses over the waypoint we count it as passed
+        if(this.bounds.overlaps(waypointBounds.get(currentWaypoint))){
+            currentWaypoint++;
         }
     }
 }
