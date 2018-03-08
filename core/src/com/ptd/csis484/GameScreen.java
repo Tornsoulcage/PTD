@@ -12,11 +12,11 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
 //TODO Add popup to ask for tower type when user taps on the map
-//TODO Vary enemy types that spawn
 //TODO Add experience reward on enemy death
 //TODO Add gold reward on enemy death
 //TODO Add Gold cost to create a tower
@@ -117,18 +117,21 @@ public class GameScreen implements Screen, InputProcessor {
             if (enemyCount != 20) {
                 double enemyToSpawn = Math.random() * 3;
                 switch ((int) enemyToSpawn) {
-                    case 0: enemyList.add(new Enemy(Enemy.enemyType.ROCK, waveNumber));
-                            break;
-                    case 1: enemyList.add(new Enemy(Enemy.enemyType.PAPER, waveNumber));
-                            break;
-                    case 2: enemyList.add(new Enemy(Enemy.enemyType.SCISSORS, waveNumber));
-                            break;
+                    case 0:
+                        enemyList.add(new Enemy(Enemy.enemyType.ROCK, waveNumber));
+                        break;
+                    case 1:
+                        enemyList.add(new Enemy(Enemy.enemyType.PAPER, waveNumber));
+                        break;
+                    case 2:
+                        enemyList.add(new Enemy(Enemy.enemyType.SCISSORS, waveNumber));
+                        break;
                 }
                 enemyCount++;
             }
         }
 
-            //Update loop for all of the enemies
+        //Update loop for all of the enemies
         for (int i = 0; i < enemyList.size(); i++) {
             //Updates the enemies with the current list of bullets
             //Checks if any bullets have hit this enemy and responds accordingly
@@ -136,26 +139,23 @@ public class GameScreen implements Screen, InputProcessor {
 
             //If our enemy leaves the bounds of the screen we remove it from the game
             //TODO add penalty for this occurring
-            if(enemyList.get(i).getPosition().x > deviceWidth || enemyList.get(i).getPosition().x < 0 ||
-                    enemyList.get(i).getPosition().y > deviceHeight || enemyList.get(i).getPosition().y < 0){
+            if (enemyList.get(i).getPosition().x > deviceWidth || enemyList.get(i).getPosition().x < 0 ||
+                    enemyList.get(i).getPosition().y > deviceHeight || enemyList.get(i).getPosition().y < 0) {
                 enemyList.remove(i);
-            } else if(enemyList.get(i).getHealth() <= 0) {
+            } else if (enemyList.get(i).getHealth() <= 0) {
                 enemyList.get(i).setDestroyed(true);
                 enemyList.remove(i);
             } else {
                 enemyList.get(i).render(shapeRenderer);
             }
             //If the enemy has taken enough damage we remove it and mark the enemy object has destroyed
-
-
-
         }
 
-            //Update loop for all of the bullets
+        //Update loop for all of the bullets
         for (int i = 0; i < bulletList.size(); i++) {
             bulletList.get(i).update(delta);
 
-                //If our target has been destroyed we change targets
+            //If our target has been destroyed we change targets
             if (bulletList.get(i).getTarget().isDestroyed()) {
                 bulletList.get(i).changeTarget();
             }
@@ -193,12 +193,10 @@ public class GameScreen implements Screen, InputProcessor {
 
     @Override
     public void pause() {
-
     }
 
     @Override
     public void resume() {
-
     }
 
     @Override
@@ -243,7 +241,18 @@ public class GameScreen implements Screen, InputProcessor {
         //If it is a tower tile we spawn a new tower
         //TODO add popup to allow user to pick a tower type
         if(property != null) {
-            towerList.add(new Tower(Tower.towerType.ROCK, cellX, cellY));
+            double towerToSpawn = Math.random() * 3;
+            switch ((int) towerToSpawn) {
+                case 0:
+                    towerList.add(new Tower(Tower.towerType.ROCK, cellX, cellY));
+                    break;
+                case 1:
+                    towerList.add(new Tower(Tower.towerType.PAPER, cellX, cellY));
+                    break;
+                case 2:
+                    towerList.add(new Tower(Tower.towerType.SCISSORS, cellX, cellY));
+                    break;
+            }
         }
         return false;
     }

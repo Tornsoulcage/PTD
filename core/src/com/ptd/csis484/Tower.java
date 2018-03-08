@@ -66,9 +66,21 @@ public class Tower {
 
     //Just draws a red rectangle to represent the tower
     public void render(ShapeRenderer renderer){
-        renderer.setColor(Color.RED);
-        renderer.set(ShapeRenderer.ShapeType.Filled);
-        renderer.rect(position.x, position.y, 20,20);
+        if(type == towerType.ROCK){
+            renderer.setColor(Color.RED);
+            renderer.set(ShapeRenderer.ShapeType.Filled);
+            renderer.rect(position.x, position.y, 20,20);
+        }
+        if(type == towerType.PAPER){
+            renderer.setColor(Color.BLACK);
+            renderer.set(ShapeRenderer.ShapeType.Filled);
+            renderer.rect(position.x, position.y, 20,20);
+        }
+        if(type == towerType.SCISSORS){
+            renderer.setColor(Color.BLUE);
+            renderer.set(ShapeRenderer.ShapeType.Filled);
+            renderer.rect(position.x, position.y, 20,20);
+        }
     }
 
     //Updates the tower to get a new target
