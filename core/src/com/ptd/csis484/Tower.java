@@ -23,6 +23,8 @@ public class Tower {
     private float deviceWidth = Gdx.graphics.getWidth();
     private float tileHeight = deviceHeight/10;
     private float tileWidth = deviceWidth/15;
+    private float cellX;
+    private float cellY;
 
     //Sets a default enemy to be the target
     private Enemy target = new Enemy(Enemy.enemyType.ROCK, 1);
@@ -43,6 +45,10 @@ public class Tower {
     //Main constructor, passes the desired type and it's location on the map
     public Tower(towerType type, float cellX, float cellY){
         this.type = type;
+
+        //Recording the cell the tower resides in
+        this.cellX = cellX;
+        this.cellY = cellY;
 
         //Formula's to convert cellX and cellY to the x/y position on the map
         float positionX = cellX*tileWidth + tileWidth/2;
@@ -202,5 +208,21 @@ public class Tower {
 
     public void setPosition(Vector2 position) {
         this.position = position;
+    }
+
+    public float getCellX() {
+        return cellX;
+    }
+
+    public void setCellX(float cellX) {
+        this.cellX = cellX;
+    }
+
+    public float getCellY() {
+        return cellY;
+    }
+
+    public void setCellY(float cellY) {
+        this.cellY = cellY;
     }
 }

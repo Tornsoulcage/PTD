@@ -13,6 +13,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,6 +64,7 @@ public class GameScreen implements Screen, InputProcessor {
 
     //Lists to keep track of towers and bullets
     private List<Tower> towerList = new ArrayList<Tower>();
+    private List<Vector2> occupiedCells = new ArrayList<Vector2>();
     private List<Bullet> bulletList = new ArrayList<Bullet>();
 
     //Counts the number of times render has been called
@@ -179,6 +181,33 @@ public class GameScreen implements Screen, InputProcessor {
         renderCount++;
         shapeRenderer.end();
     }
+
+    //Spawns a tower on the requested tile
+    public void spawnTower(float cellX, float cellY){
+        //TODO add popup to allow user to pick a tower type
+        double towerToSpawn = Math.random() * 3;
+        switch ((int) towerToSpawn) {
+            case 0:
+                towerList.add(new Tower(Tower.towerType.ROCK, cellX, cellY));
+                occupiedCells.add(new Vector2(cellX, cellY));
+                break;
+            case 1:
+                towerList.add(new Tower(Tower.towerType.PAPER, cellX, cellY));
+                occupiedCells.add(new Vector2(cellX, cellY));
+                break;
+            case 2:
+                towerList.add(new Tower(Tower.towerType.SCISSORS, cellX, cellY));
+                occupiedCells.add(new Vector2(cellX, cellY));
+                break;
+            }
+    }
+
+    //Changes the type of the tower in question
+    //TODO Finish this
+    public void changeTowerType(Tower tower){
+        tower.setType(Tower.towerType.PAPER);
+    }
+
     @Override
     public void show() {
         Gdx.input.setInputProcessor(this);
@@ -186,7 +215,6 @@ public class GameScreen implements Screen, InputProcessor {
 
     @Override
     public void resize(int width, int height) {
-
     }
 
     @Override
@@ -236,22 +264,34 @@ public class GameScreen implements Screen, InputProcessor {
         TiledMapTileLayer.Cell cell = layer.getCell((int) cellX, (int) (10 - 1 - cellY));
         Object property = cell.getTile().getProperties().get("TowerTile");
 
-        //If it is a tower tile we spawn a new tower
-        //TODO add popup to allow user to pick a tower type
-        if(property != null) {
-            double towerToSpawn = Math.random() * 3;
-            switch ((int) towerToSpawn) {
-                case 0:
-                    towerList.add(new Tower(Tower.towerType.ROCK, cellX, cellY));
-                    break;
-                case 1:
-                    towerList.add(new Tower(Tower.towerType.PAPER, cellX, cellY));
-                    break;
-                case 2:
-                    towerList.add(new Tower(Tower.towerType.SCISSORS, cellX, cellY));
-                    break;
+        //If it is a tower tile we check other traits
+        if (property != null) {
+            //Shows whether or not the cell in question is already occupied
+            boolean occupiedCell = false;
+
+            //Loops through all of our occupied cells to check occupancy
+            for (Vector2 vector : occupiedCells) {
+                if (vector.x == cellX && vector.y == cellY) {
+                    occupiedCell = true;
+                }
+            }
+
+            //If the cell is not occupied we spawn a new tower
+            if (!occupiedCell) {
+                spawnTower(cellX, cellY);
+            }
+
+            //If the cell is occupied we change the tower type
+            if(occupiedCell){
+                for(Tower tower : towerList){
+                    if(tower.getCellX() == cellX && tower.getCellY() == cellY){
+                        changeTowerType(tower);
+                        break;
+                    }
+                }
             }
         }
+
         return false;
     }
 
