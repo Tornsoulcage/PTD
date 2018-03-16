@@ -3,8 +3,10 @@ package com.ptd.csis484;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
@@ -19,7 +21,6 @@ import com.badlogic.gdx.utils.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO Add ability to level towers up
 //TODO Add ability to save user progress
 //TODO Add procedural generated maps
 
@@ -55,6 +56,7 @@ public class GameScreen implements Screen, InputProcessor {
     private int viewportHeight = TILE_Y_COUNT * TILE_SIDE_LENGTH;
 
     private Rectangle gameBounds = new Rectangle(0,0, deviceWidth, deviceHeight);
+    private Rectangle levelButton = new Rectangle();
 
     //List to keep track of enemies and a count of how many have been spawned
     private List<Enemy> enemyList = new ArrayList<Enemy>();
@@ -62,6 +64,10 @@ public class GameScreen implements Screen, InputProcessor {
 
     //Keeps track of the wave number
     private int waveNumber = 1;
+
+    //Scaling for the towers in the current wave
+    private int towerLevel = 1;
+    private int towerLevelCost = 100;
 
     //Lists to keep track of towers and bullets
     private List<Tower> towerList = new ArrayList<Tower>();
@@ -96,27 +102,19 @@ public class GameScreen implements Screen, InputProcessor {
         Gdx.gl.glClearColor(0, 0, 0.2f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        //Three message strings for the user
-        String goldString = "Gold = " + gold;
-        String waveString = "Wave = " + waveNumber;
-        String lifeString = "Life = " + remainingLife;
-
         //Displaying the tiled map for the user
         camera.update();
         tiledMapRenderer.setView(camera);
         tiledMapRenderer.render();
 
-        //Displaying the strings in the top left corner of the screen for the user
-        camera.update();
-        game.batch.setProjectionMatrix(camera.combined);
-        game.batch.begin();
-        game.font.draw(game.batch, goldString, 0, viewportHeight);
-        game.font.draw(game.batch, waveString, 0, viewportHeight - (TILE_SIDE_LENGTH - game.font.getXHeight()));
-        game.font.draw(game.batch, lifeString, 0, viewportHeight - 2*(TILE_SIDE_LENGTH - game.font.getXHeight()));
-        game.batch.end();
-
         //Starting the shape renderer
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+
+        //Adding a level up button in the corner
+        levelButton = new Rectangle(3*tileWidth, 8*tileHeight, 2*tileWidth, 2*tileHeight);
+        shapeRenderer.setColor(Color.BLACK);
+        shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.rect(levelButton.getX(), levelButton.getY(), levelButton.getWidth(), levelButton.getHeight());
 
         //Looping through the towers and updating and drawing them
         for (Tower tower : towerList) {
@@ -126,7 +124,7 @@ public class GameScreen implements Screen, InputProcessor {
             //Every 30 renders wo spawn a new bullet, about 2 times a second
             if (renderCount % 30 == 0) {
                 if (!enemyList.isEmpty()) {
-                    bulletList.add(new Bullet(tower.getDamage(), tower.getTarget(), tower));
+                    bulletList.add(new Bullet(tower.getScaledDamage(), tower.getTarget(), tower));
                 }
             }
         }
@@ -203,6 +201,23 @@ public class GameScreen implements Screen, InputProcessor {
         //Incrementing the render count and ending the shape renderer
         renderCount++;
         shapeRenderer.end();
+
+        //Message strings for the user
+        String goldString = "Gold = " + gold;
+        String waveString = "Wave = " + waveNumber;
+        String lifeString = "Life = " + remainingLife;
+        String levelString = "Lvl = " + towerLevel;
+        String costString = "Cost = " + towerLevelCost;
+
+        //Displaying the strings in the top left corner of the screen for the user
+        game.batch.setProjectionMatrix(camera.combined);
+        game.batch.begin();
+        game.font.draw(game.batch, goldString, 0, viewportHeight);
+        game.font.draw(game.batch, waveString, 0, viewportHeight - (TILE_SIDE_LENGTH - game.font.getXHeight()));
+        game.font.draw(game.batch, lifeString, 0, viewportHeight - 2*(TILE_SIDE_LENGTH - game.font.getXHeight()));
+        game.font.draw(game.batch, levelString, 3*TILE_SIDE_LENGTH, viewportHeight - TILE_SIDE_LENGTH + 2*game.font.getXHeight());
+        game.font.draw(game.batch, costString, 3*TILE_SIDE_LENGTH, viewportHeight - TILE_SIDE_LENGTH - game.font.getXHeight());
+        game.batch.end();
     }
 
     //Spawns a tower on the requested tile
@@ -221,7 +236,7 @@ public class GameScreen implements Screen, InputProcessor {
                 break;
         }
 
-        if(gold > tower.getGoldCost()){
+        if(gold >= tower.getGoldCost()){
             gold -= tower.getGoldCost();
             towerList.add(tower);
             occupiedCells.add(new Vector2(cellX, cellY));
@@ -291,6 +306,20 @@ public class GameScreen implements Screen, InputProcessor {
         cellX = MathUtils.floor(cellX);
         cellY = MathUtils.floor(cellY);
 
+        //Checking if the user taps the level up squares
+        Rectangle touch = new Rectangle(screenX, deviceHeight - screenY, 1, 1);
+        if(touch.overlaps(levelButton)){
+            if(gold >= towerLevelCost) {
+                towerLevel++;
+                gold -= towerLevelCost;
+                towerLevelCost = (int) Math.floor(towerLevelCost * 1.05);
+            }
+
+            for(Tower tower : towerList){
+                tower.setWaveTowerLevel(towerLevel);
+            }
+        }
+
         //Getting the cell the user tapped and checking if it is a tower tile
         TiledMapTileLayer layer = (TiledMapTileLayer) tiledMap.getLayers().get(0);
         TiledMapTileLayer.Cell cell = layer.getCell((int) cellX, (int) (10 - 1 - cellY));
@@ -321,7 +350,7 @@ public class GameScreen implements Screen, InputProcessor {
                         if((System.currentTimeMillis() - tower.getTimeCreated()) < 5000){
                             changeTowerType(tower);
                             tower.setTimeCreated(System.currentTimeMillis());
-                        } else if(gold > tower.getSwitchCost()){
+                        } else if(gold >= tower.getSwitchCost()){
                             changeTowerType(tower);
                             gold -= tower.getSwitchCost();
                             tower.setTimeCreated(System.currentTimeMillis());

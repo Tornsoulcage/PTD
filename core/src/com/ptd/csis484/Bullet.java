@@ -29,7 +29,7 @@ public class Bullet {
 
     public Bullet(int dam, Enemy target, Tower source){
         this.source = source;
-        this.damage = source.getDamage();
+        this.damage = source.getScaledDamage();
         this.target = target;
 
         //10 is the default speed for now

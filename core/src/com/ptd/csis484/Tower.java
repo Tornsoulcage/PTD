@@ -16,7 +16,8 @@ import java.util.List;
 //Represents the tower objects
 public class Tower {
     //Damage each bullet does
-    private int damage;
+    private int baseDamage;
+    private int scaledDamage;
 
     //Variables used to help calculate position
     private float deviceHeight = Gdx.graphics.getHeight();
@@ -30,8 +31,11 @@ public class Tower {
     private int goldCost;
     private int upgradeCost;
     private int switchCost;
+
     private int towerLevel;
     private long timeCreated;
+
+    private int waveTowerLevel = 1;
 
     //Sets a default enemy to be the target
     private Enemy target = new Enemy(Enemy.enemyType.ROCK, 1);
@@ -78,14 +82,15 @@ public class Tower {
         this.position = new Vector2(positionX, positionY);
 
         //Depending on the tower type we change it's variables
-        if (this.type == towerType.ROCK)
-            damage = 3;
-
-        if (this.type == towerType.PAPER)
-            damage = 5;
-
-        if (this.type == towerType.SCISSORS)
-            damage = 1;
+        if (this.type == towerType.ROCK) {
+            baseDamage = 3;
+        }
+        if (this.type == towerType.PAPER) {
+            baseDamage = 5;
+        }
+        if (this.type == towerType.SCISSORS) {
+            baseDamage = 1;
+        }
     }
 
     //Just draws a red rectangle to represent the tower
@@ -109,6 +114,8 @@ public class Tower {
 
     //Updates the tower to get a new target
     public void update(List<Enemy> enemyList, float delta) {
+        //Updating our damage to the current waveTowerLevel value
+        this.scaledDamage = this.baseDamage * waveTowerLevel;
         //Variable to hold temp distance for each enemy
         double newTargetDist;
         //Only runs if there is a enemy
@@ -140,12 +147,20 @@ public class Tower {
         }
     }
 
-    public int getDamage() {
-        return damage;
+    public int getBaseDamage() {
+        return baseDamage;
     }
 
-    public void setDamage(int damage) {
-        this.damage = damage;
+    public void setBaseDamage(int baseDamage) {
+        this.baseDamage = baseDamage;
+    }
+
+    public int getScaledDamage() {
+        return scaledDamage;
+    }
+
+    public void setScaledDamage(int scaledDamage) {
+        this.scaledDamage = scaledDamage;
     }
 
     public float getDeviceHeight() {
@@ -282,5 +297,13 @@ public class Tower {
 
     public void setTimeCreated(long timeCreated) {
         this.timeCreated = timeCreated;
+    }
+
+    public int getWaveTowerLevel() {
+        return waveTowerLevel;
+    }
+
+    public void setWaveTowerLevel(int waveTowerLevel) {
+        this.waveTowerLevel = waveTowerLevel;
     }
 }
