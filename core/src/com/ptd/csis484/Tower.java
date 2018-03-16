@@ -23,9 +23,15 @@ public class Tower {
     private float deviceWidth = Gdx.graphics.getWidth();
     private float tileHeight = deviceHeight/10;
     private float tileWidth = deviceWidth/15;
-    private float cellX;
-    private float cellY;
+    private float cellX = 0;
+    private float cellY = 0;
+
+    //Variables associated with creating this tower
     private int goldCost;
+    private int upgradeCost;
+    private int switchCost;
+    private int towerLevel;
+    private long timeCreated;
 
     //Sets a default enemy to be the target
     private Enemy target = new Enemy(Enemy.enemyType.ROCK, 1);
@@ -45,16 +51,13 @@ public class Tower {
 
     //Default Constructor
     public Tower() {
-        this.damage = 0;
-        this.goldCost = 30;
-        this.target = new Enemy();
-        this.type = towerType.PAPER;
         this.position = new Vector2(0,0);
     }
 
     //Main constructor, passes the desired type and it's location on the map
     public Tower(towerType type, float cellX, float cellY){
         this.type = type;
+        this.timeCreated = System.currentTimeMillis();
 
         //Recording the cell the tower resides in
         this.cellX = cellX;
@@ -66,7 +69,10 @@ public class Tower {
 
         targetDist = deviceWidth;
 
+        //Setting the costs for all towers
         goldCost = 30;
+        upgradeCost = 15;
+        switchCost = 10;
 
         //Setting the position of the tower
         this.position = new Vector2(positionX, positionY);
@@ -244,5 +250,37 @@ public class Tower {
 
     public void setGoldCost(int goldCost) {
         this.goldCost = goldCost;
+    }
+
+    public int getUpgradeCost() {
+        return upgradeCost;
+    }
+
+    public void setUpgradeCost(int upgradeCost) {
+        this.upgradeCost = upgradeCost;
+    }
+
+    public int getSwitchCost() {
+        return switchCost;
+    }
+
+    public void setSwitchCost(int switchCost) {
+        this.switchCost = switchCost;
+    }
+
+    public int getTowerLevel() {
+        return towerLevel;
+    }
+
+    public void setTowerLevel(int towerLevel) {
+        this.towerLevel = towerLevel;
+    }
+
+    public long getTimeCreated() {
+        return timeCreated;
+    }
+
+    public void setTimeCreated(long timeCreated) {
+        this.timeCreated = timeCreated;
     }
 }

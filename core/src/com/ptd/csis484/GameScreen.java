@@ -19,9 +19,6 @@ import com.badlogic.gdx.utils.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO Add experience reward on enemy death
-//TODO Add gold reward on enemy death
-//TODO Add Gold cost to create a tower
 //TODO Add ability to level towers up
 //TODO Add ability to save user progress
 //TODO Add procedural generated maps
@@ -199,7 +196,6 @@ public class GameScreen implements Screen, InputProcessor {
 
         //Incrementing the render count and ending the shape renderer
         renderCount++;
-        Gdx.app.log("Gold: ", "" + gold);
         shapeRenderer.end();
     }
 
@@ -289,8 +285,6 @@ public class GameScreen implements Screen, InputProcessor {
         cellX = MathUtils.floor(cellX);
         cellY = MathUtils.floor(cellY);
 
-        Gdx.app.log("Occupied: ", "" + cellX + " " + cellY);
-
         //Getting the cell the user tapped and checking if it is a tower tile
         TiledMapTileLayer layer = (TiledMapTileLayer) tiledMap.getLayers().get(0);
         TiledMapTileLayer.Cell cell = layer.getCell((int) cellX, (int) (10 - 1 - cellY));
@@ -315,10 +309,18 @@ public class GameScreen implements Screen, InputProcessor {
 
             //If the cell is occupied we change the tower type
             if(occupiedCell){
-                Gdx.app.log("Occupied: ", "" + occupiedCell);
                 for(Tower tower : towerList){
                     if(tower.getCellX() == cellX && tower.getCellY() == cellY){
-                        changeTowerType(tower);
+                        //If it's within 5 seconds of a tower change or creation the change is free
+                        Gdx.app.log("TimeElapsed: ", "" + (System.currentTimeMillis() - tower.getTimeCreated()));
+                        if((System.currentTimeMillis() - tower.getTimeCreated()) < 5000){
+                            changeTowerType(tower);
+                            tower.setTimeCreated(System.currentTimeMillis());
+                        } else if(gold > tower.getSwitchCost()){
+                            changeTowerType(tower);
+                            gold -= tower.getSwitchCost();
+                            tower.setTimeCreated(System.currentTimeMillis());
+                        }
                         break;
                     }
                 }

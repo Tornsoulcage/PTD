@@ -99,6 +99,7 @@ public class Enemy {
         //Marking the enemy undestroyed
         destroyed = false;
 
+        //Gold value for destroying an enemy
         goldValue = 10;
 
         //Setting our waypoints for the test map
