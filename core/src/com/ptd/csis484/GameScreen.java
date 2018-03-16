@@ -210,21 +210,19 @@ public class GameScreen implements Screen, InputProcessor {
         switch ((int) towerToSpawn) {
             case 0:
                 tower = new Tower(Tower.towerType.ROCK, cellX, cellY);
-                occupiedCells.add(new Vector2(cellX, cellY));
                 break;
             case 1:
                 tower = new Tower(Tower.towerType.PAPER, cellX, cellY);
-                occupiedCells.add(new Vector2(cellX, cellY));
                 break;
             case 2:
                 tower = new Tower(Tower.towerType.SCISSORS, cellX, cellY);
-                occupiedCells.add(new Vector2(cellX, cellY));
                 break;
         }
 
         if(gold > tower.getGoldCost()){
             gold -= tower.getGoldCost();
             towerList.add(tower);
+            occupiedCells.add(new Vector2(cellX, cellY));
         }
     }
 
@@ -291,6 +289,8 @@ public class GameScreen implements Screen, InputProcessor {
         cellX = MathUtils.floor(cellX);
         cellY = MathUtils.floor(cellY);
 
+        Gdx.app.log("Occupied: ", "" + cellX + " " + cellY);
+
         //Getting the cell the user tapped and checking if it is a tower tile
         TiledMapTileLayer layer = (TiledMapTileLayer) tiledMap.getLayers().get(0);
         TiledMapTileLayer.Cell cell = layer.getCell((int) cellX, (int) (10 - 1 - cellY));
@@ -315,6 +315,7 @@ public class GameScreen implements Screen, InputProcessor {
 
             //If the cell is occupied we change the tower type
             if(occupiedCell){
+                Gdx.app.log("Occupied: ", "" + occupiedCell);
                 for(Tower tower : towerList){
                     if(tower.getCellX() == cellX && tower.getCellY() == cellY){
                         changeTowerType(tower);
