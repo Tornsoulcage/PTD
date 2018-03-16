@@ -162,6 +162,12 @@ public class GameScreen implements Screen, InputProcessor {
                toEnemyRemove.add(enemy);
                enemy.setDestroyed(true);
                remainingLife--;
+
+               //If the user's life total has reached zero we end the game
+               if(remainingLife <= 0){
+                   game.setScreen(new GameOverScreen(game));
+                   dispose();
+               }
             } else if (enemy.getHealth() <= 0) {
                 enemy.setDestroyed(true);
                 gold += enemy.getGoldValue();
@@ -312,7 +318,6 @@ public class GameScreen implements Screen, InputProcessor {
                 for(Tower tower : towerList){
                     if(tower.getCellX() == cellX && tower.getCellY() == cellY){
                         //If it's within 5 seconds of a tower change or creation the change is free
-                        Gdx.app.log("TimeElapsed: ", "" + (System.currentTimeMillis() - tower.getTimeCreated()));
                         if((System.currentTimeMillis() - tower.getTimeCreated()) < 5000){
                             changeTowerType(tower);
                             tower.setTimeCreated(System.currentTimeMillis());
