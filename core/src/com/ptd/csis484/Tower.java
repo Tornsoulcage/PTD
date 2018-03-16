@@ -25,6 +25,7 @@ public class Tower {
     private float tileWidth = deviceWidth/15;
     private float cellX;
     private float cellY;
+    private int goldCost;
 
     //Sets a default enemy to be the target
     private Enemy target = new Enemy(Enemy.enemyType.ROCK, 1);
@@ -42,6 +43,15 @@ public class Tower {
     //Towers position on map
     private Vector2 position;
 
+    //Default Constructor
+    public Tower() {
+        this.damage = 0;
+        this.goldCost = 30;
+        this.target = new Enemy();
+        this.type = towerType.PAPER;
+        this.position = new Vector2(0,0);
+    }
+
     //Main constructor, passes the desired type and it's location on the map
     public Tower(towerType type, float cellX, float cellY){
         this.type = type;
@@ -55,6 +65,8 @@ public class Tower {
         float positionY = deviceHeight - 1 - (cellY*tileHeight) - tileHeight/2;
 
         targetDist = deviceWidth;
+
+        goldCost = 30;
 
         //Setting the position of the tower
         this.position = new Vector2(positionX, positionY);
@@ -99,7 +111,7 @@ public class Tower {
             for (Enemy enemy : enemyList) {
                 //If our target has been destroyed we switch to the default target
                 if(target.isDestroyed()){
-                    this.target = new Enemy(Enemy.enemyType.ROCK, 1);
+                    this.target = new Enemy();
                 }
 
                 //Gets the current distance to the target
@@ -118,7 +130,7 @@ public class Tower {
                 }
             }
         } else {
-            this.target = new Enemy(Enemy.enemyType.ROCK, 1);
+            this.target = new Enemy();
         }
     }
 
@@ -224,5 +236,13 @@ public class Tower {
 
     public void setCellY(float cellY) {
         this.cellY = cellY;
+    }
+
+    public int getGoldCost() {
+        return goldCost;
+    }
+
+    public void setGoldCost(int goldCost) {
+        this.goldCost = goldCost;
     }
 }

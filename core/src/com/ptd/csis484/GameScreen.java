@@ -14,11 +14,11 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO Add popup to ask for tower type when user taps on the map
 //TODO Add experience reward on enemy death
 //TODO Add gold reward on enemy death
 //TODO Add Gold cost to create a tower
@@ -53,6 +53,10 @@ public class GameScreen implements Screen, InputProcessor {
     private float tileHeight = deviceHeight/TILE_Y_COUNT;
     private float tileWidth = deviceWidth/TILE_X_COUNT;
 
+    //Size of the map
+    private int viewportWidth = TILE_X_COUNT * TILE_SIDE_LENGTH;
+    private int viewportHeight = TILE_Y_COUNT * TILE_SIDE_LENGTH;
+
     private Rectangle gameBounds = new Rectangle(0,0, deviceWidth, deviceHeight);
 
     //List to keep track of enemies and a count of how many have been spawned
@@ -71,13 +75,12 @@ public class GameScreen implements Screen, InputProcessor {
     //Used to space out the spawning of enemies and bullets
     private int renderCount = 0;
 
+    private int gold = 100;
+    private int remainingLife = 20;
+
     //Creating the Screen and rendering a test map
     public GameScreen(final PTD game) {
         this.game = game;
-
-        //Size of the map
-        int viewportWidth = TILE_X_COUNT * TILE_SIDE_LENGTH;
-        int viewportHeight = TILE_Y_COUNT * TILE_SIDE_LENGTH;
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, viewportWidth, viewportHeight);
@@ -96,9 +99,24 @@ public class GameScreen implements Screen, InputProcessor {
         Gdx.gl.glClearColor(0, 0, 0.2f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        //Three message strings for the user
+        String goldString = "Gold = " + gold;
+        String waveString = "Wave = " + waveNumber;
+        String lifeString = "Life = " + remainingLife;
+
+        //Displaying the tiled map for the user
         camera.update();
         tiledMapRenderer.setView(camera);
         tiledMapRenderer.render();
+
+        //Displaying the strings in the top left corner of the screen for the user
+        camera.update();
+        game.batch.setProjectionMatrix(camera.combined);
+        game.batch.begin();
+        game.font.draw(game.batch, goldString, 0, viewportHeight);
+        game.font.draw(game.batch, waveString, 0, viewportHeight - (TILE_SIDE_LENGTH - game.font.getXHeight()));
+        game.font.draw(game.batch, lifeString, 0, viewportHeight - 2*(TILE_SIDE_LENGTH - game.font.getXHeight()));
+        game.batch.end();
 
         //Starting the shape renderer
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
@@ -143,11 +161,13 @@ public class GameScreen implements Screen, InputProcessor {
             enemy.update(delta, bulletList);
 
             //If our enemy leaves the bounds of the screen we remove it from the game
-            //TODO add penalty for this occurring
             if (!gameBounds.contains(enemy.getBounds())) {
                toEnemyRemove.add(enemy);
+               enemy.setDestroyed(true);
+               remainingLife--;
             } else if (enemy.getHealth() <= 0) {
                 enemy.setDestroyed(true);
+                gold += enemy.getGoldValue();
                 toEnemyRemove.add(enemy);
             }
 
@@ -179,33 +199,45 @@ public class GameScreen implements Screen, InputProcessor {
 
         //Incrementing the render count and ending the shape renderer
         renderCount++;
+        Gdx.app.log("Gold: ", "" + gold);
         shapeRenderer.end();
     }
 
     //Spawns a tower on the requested tile
     public void spawnTower(float cellX, float cellY){
-        //TODO add popup to allow user to pick a tower type
         double towerToSpawn = Math.random() * 3;
+        Tower tower = new Tower();
         switch ((int) towerToSpawn) {
             case 0:
-                towerList.add(new Tower(Tower.towerType.ROCK, cellX, cellY));
+                tower = new Tower(Tower.towerType.ROCK, cellX, cellY);
                 occupiedCells.add(new Vector2(cellX, cellY));
                 break;
             case 1:
-                towerList.add(new Tower(Tower.towerType.PAPER, cellX, cellY));
+                tower = new Tower(Tower.towerType.PAPER, cellX, cellY);
                 occupiedCells.add(new Vector2(cellX, cellY));
                 break;
             case 2:
-                towerList.add(new Tower(Tower.towerType.SCISSORS, cellX, cellY));
+                tower = new Tower(Tower.towerType.SCISSORS, cellX, cellY);
                 occupiedCells.add(new Vector2(cellX, cellY));
                 break;
-            }
+        }
+
+        if(gold > tower.getGoldCost()){
+            gold -= tower.getGoldCost();
+            towerList.add(tower);
+        }
     }
 
     //Changes the type of the tower in question
-    //TODO Finish this
     public void changeTowerType(Tower tower){
-        tower.setType(Tower.towerType.PAPER);
+        //We just rotate through the three tower types
+        if(tower.getType() == Tower.towerType.ROCK){
+            tower.setType(Tower.towerType.PAPER);
+        } else if(tower.getType() == Tower.towerType.PAPER){
+            tower.setType(Tower.towerType.SCISSORS);
+        } else if(tower.getType() == Tower.towerType.SCISSORS){
+            tower.setType(Tower.towerType.ROCK);
+        }
     }
 
     @Override

@@ -24,6 +24,7 @@ public class Enemy {
     private boolean destroyed;
     private float waveScale = 1;
     private int currentWaypoint = 0;
+    private int goldValue = 0;
 
     //Used to track the enemy's position and which waypoints have been passed
     private Vector2 position = new Vector2();
@@ -49,6 +50,16 @@ public class Enemy {
 
     //Bounds of the enemy's rectangle
     private Rectangle bounds;
+
+    //Default Constructor
+    public Enemy() {
+        this.damage = 0;
+        this.speed = 0;
+        this.health = 1;
+        this.destroyed = false;
+        this.goldValue = 0;
+        this.position = waypointStart;
+    }
 
     public Enemy(enemyType type, int wave){
         //Different values are passed depending on the enemy type
@@ -87,6 +98,8 @@ public class Enemy {
 
         //Marking the enemy undestroyed
         destroyed = false;
+
+        goldValue = 10;
 
         //Setting our waypoints for the test map
         waypointBounds.add(new Rectangle(tileWidth*6 + tileWidth/3, tileHeight*2 + tileHeight/3, tileWidth/3 , tileHeight/3));
@@ -288,5 +301,13 @@ public class Enemy {
 
     public void setBounds(Rectangle bounds) {
         this.bounds = bounds;
+    }
+
+    public int getGoldValue() {
+        return goldValue;
+    }
+
+    public void setGoldValue(int goldValue) {
+        this.goldValue = goldValue;
     }
 }
