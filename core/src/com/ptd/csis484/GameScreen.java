@@ -35,28 +35,11 @@ public class GameScreen implements Screen, InputProcessor {
     private final PTD game;
     private OrthographicCamera camera;
 
-    //Stats on the tile sizes for the map
-    private final int TILE_X_COUNT = 15;
-    private final int TILE_Y_COUNT = 10;
-    private final int TILE_SIDE_LENGTH = 32;
-
     //We use a tile map because it makes more sense with placing towers
     private TiledMap tiledMap;
     private TiledMapRenderer tiledMapRenderer;
     private ShapeRenderer shapeRenderer;
-
-    //Gets the dimensions of the tiles
-    private float deviceHeight = Gdx.graphics.getHeight();
-    private float deviceWidth = Gdx.graphics.getWidth();
-    private float tileHeight = deviceHeight/TILE_Y_COUNT;
-    private float tileWidth = deviceWidth/TILE_X_COUNT;
-
-    //Size of the map
-    private int viewportWidth = TILE_X_COUNT * TILE_SIDE_LENGTH;
-    private int viewportHeight = TILE_Y_COUNT * TILE_SIDE_LENGTH;
-
-    private Rectangle gameBounds = new Rectangle(0,0, deviceWidth, deviceHeight);
-    private Rectangle levelButton = new Rectangle();
+    private Map gameMap = new Map();
 
     //List to keep track of enemies and a count of how many have been spawned
     private List<Enemy> enemyList = new ArrayList<Enemy>();
@@ -326,7 +309,7 @@ public class GameScreen implements Screen, InputProcessor {
         Object property = cell.getTile().getProperties().get("TowerTile");
 
         //If it is a tower tile we check other traits
-        if (property != null) {
+        if (cell.getTile().getId() == 1) {
             //Shows whether or not the cell in question is already occupied
             boolean occupiedCell = false;
 
