@@ -36,8 +36,6 @@ public class GameScreen implements Screen, InputProcessor {
     private OrthographicCamera camera;
 
     //We use a tile map because it makes more sense with placing towers
-    private TiledMap tiledMap;
-    private TiledMapRenderer tiledMapRenderer;
     private ShapeRenderer shapeRenderer;
     private Map gameMap = new Map();
 
@@ -69,11 +67,8 @@ public class GameScreen implements Screen, InputProcessor {
         this.game = game;
 
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, viewportWidth, viewportHeight);
+        camera.setToOrtho(false, gameMap.getViewportWidth(), gameMap.getViewportHeight());
         camera.update();
-
-        tiledMap = new TmxMapLoader().load("PTDMap.tmx");
-        tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
 
         //Shape Renderer is how we draw the enemies
         shapeRenderer = new ShapeRenderer();
@@ -85,19 +80,19 @@ public class GameScreen implements Screen, InputProcessor {
         Gdx.gl.glClearColor(0, 0, 0.2f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        game.batch.begin();
+        gameMap.render(game);
+        game.batch.end();
+
         //Displaying the tiled map for the user
         camera.update();
-        tiledMapRenderer.setView(camera);
-        tiledMapRenderer.render();
 
         //Starting the shape renderer
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
-        //Adding a level up button in the corner
-        levelButton = new Rectangle(3*tileWidth, 8*tileHeight, 2*tileWidth, 2*tileHeight);
         shapeRenderer.setColor(Color.BLACK);
         shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.rect(levelButton.getX(), levelButton.getY(), levelButton.getWidth(), levelButton.getHeight());
+        shapeRenderer.rect(gameMap.getLevelButton().getX(), gameMap.getLevelButton().getY(), gameMap.getLevelButton().getWidth(), gameMap.getLevelButton().getHeight());
 
         //Looping through the towers and updating and drawing them
         for (Tower tower : towerList) {
@@ -136,10 +131,10 @@ public class GameScreen implements Screen, InputProcessor {
         List<Enemy> toEnemyRemove = new ArrayList<Enemy>();
         for (Enemy enemy : enemyList) {
             //Updates the enemies with the current list of bullets
-            enemy.update(delta, bulletList);
+            enemy.update(delta, bulletList, gameMap);
 
             //If our enemy leaves the bounds of the screen we remove it from the game
-            if (!gameBounds.contains(enemy.getBounds())) {
+            if (!gameMap.getGameBounds().contains(enemy.getBounds())) {
                toEnemyRemove.add(enemy);
                enemy.setDestroyed(true);
                remainingLife--;
@@ -166,7 +161,7 @@ public class GameScreen implements Screen, InputProcessor {
             bullet.update(delta);
 
             //If our bullet is out of bounds
-            if (!gameBounds.contains(bullet.getBounds())) {
+            if (!gameMap.getGameBounds().contains(bullet.getBounds())) {
                 toBulletRemove.add(bullet);
             }
 
@@ -195,11 +190,11 @@ public class GameScreen implements Screen, InputProcessor {
         //Displaying the strings in the top left corner of the screen for the user
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
-        game.font.draw(game.batch, goldString, 0, viewportHeight);
-        game.font.draw(game.batch, waveString, 0, viewportHeight - (TILE_SIDE_LENGTH - game.font.getXHeight()));
-        game.font.draw(game.batch, lifeString, 0, viewportHeight - 2*(TILE_SIDE_LENGTH - game.font.getXHeight()));
-        game.font.draw(game.batch, levelString, 3*TILE_SIDE_LENGTH, viewportHeight - TILE_SIDE_LENGTH + 2*game.font.getXHeight());
-        game.font.draw(game.batch, costString, 3*TILE_SIDE_LENGTH, viewportHeight - TILE_SIDE_LENGTH - game.font.getXHeight());
+        game.font.draw(game.batch, goldString, 0, gameMap.getViewportHeight());
+        game.font.draw(game.batch, waveString, 0, gameMap.getViewportHeight() - (gameMap.getTILE_SIDE_LENGTH() - game.font.getXHeight()));
+        game.font.draw(game.batch, lifeString, 0, gameMap.getViewportHeight() - 2*(gameMap.getTILE_SIDE_LENGTH() - game.font.getXHeight()));
+        game.font.draw(game.batch, levelString, 3*gameMap.getTILE_SIDE_LENGTH(), gameMap.getViewportHeight() - gameMap.getTILE_SIDE_LENGTH() + 2*game.font.getXHeight());
+        game.font.draw(game.batch, costString, 3*gameMap.getTILE_SIDE_LENGTH(), gameMap.getViewportHeight() - gameMap.getTILE_SIDE_LENGTH() - game.font.getXHeight());
         game.batch.end();
     }
 
@@ -262,7 +257,6 @@ public class GameScreen implements Screen, InputProcessor {
 
     @Override
     public void dispose() {
-        tiledMap.dispose();
         shapeRenderer.dispose();
     }
 
@@ -284,14 +278,14 @@ public class GameScreen implements Screen, InputProcessor {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         //Figuring our which spot on the grid the user tapped
-        float cellX = screenX/tileWidth;
-        float cellY = screenY/tileHeight;
+        float cellX = screenX/gameMap.getTileWidth();
+        float cellY = screenY/gameMap.getTileHeight();
         cellX = MathUtils.floor(cellX);
         cellY = MathUtils.floor(cellY);
 
         //Checking if the user taps the level up squares
-        Rectangle touch = new Rectangle(screenX, deviceHeight - screenY, 1, 1);
-        if(touch.overlaps(levelButton)){
+        Rectangle touch = new Rectangle(screenX, gameMap.getDeviceHeight() - screenY, 1, 1);
+        if(touch.overlaps(gameMap.getGameBounds())){
             if(gold >= towerLevelCost) {
                 towerLevel++;
                 gold -= towerLevelCost;
@@ -302,12 +296,7 @@ public class GameScreen implements Screen, InputProcessor {
                 tower.setWaveTowerLevel(towerLevel);
             }
         }
-
-        //Getting the cell the user tapped and checking if it is a tower tile
-        TiledMapTileLayer layer = (TiledMapTileLayer) tiledMap.getLayers().get(0);
-        TiledMapTileLayer.Cell cell = layer.getCell((int) cellX, (int) (10 - 1 - cellY));
-        Object property = cell.getTile().getProperties().get("TowerTile");
-
+/*
         //If it is a tower tile we check other traits
         if (cell.getTile().getId() == 1) {
             //Shows whether or not the cell in question is already occupied
@@ -324,7 +313,8 @@ public class GameScreen implements Screen, InputProcessor {
             if (!occupiedCell) {
                 spawnTower(cellX, cellY);
             }
-
+*/
+           boolean occupiedCell = true;
             //If the cell is occupied we change the tower type
             if(occupiedCell){
                 for(Tower tower : towerList){
@@ -342,7 +332,7 @@ public class GameScreen implements Screen, InputProcessor {
                     }
                 }
             }
-        }
+        //}
 
         return false;
     }
