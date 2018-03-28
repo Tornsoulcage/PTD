@@ -103,26 +103,34 @@ public class Map {
         mapArray[9] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 't', 't', 't', 't', 't'};
 
         List<Vector2>neighborPathTiles = new ArrayList<Vector2>();
+        int xNeighbor = 1;
+        int yNeighbor = 1;
         for(int y = 0; y < mapArray.length; y++){
             for(int x = 0; x < mapArray[y].length; x++){
                 if(mapArray[y][x] == 'p'){
                     if(mapArray[y-1][x] == 'p'){
                         neighborPathTiles.add(new Vector2(x,y));
+                        yNeighbor++;
                     }
                     if(mapArray[y+1][x] == 'p'){
                         neighborPathTiles.add(new Vector2(x,y));
+                        yNeighbor++;
                     }
                     if(mapArray[y][x-1] == 'p'){
                         neighborPathTiles.add(new Vector2(x,y));
+                        xNeighbor++;
                     }
                     if(mapArray[y][x+1] == 'p'){
                         neighborPathTiles.add(new Vector2(x,y));
+                        xNeighbor++;
                     }
-                    if(neighborPathTiles.size() == 2){
-                        if(neighborPathTiles.get(0).x != neighborPathTiles.get(1).x && neighborPathTiles.get(0).y != neighborPathTiles.get(1).y) {
-                            waypointBounds.add(new Rectangle(tileWidth * x + tileWidth / 3, tileHeight * y + tileHeight / 3, tileWidth / 3, tileHeight / 3));
-                            neighborPathTiles = new ArrayList<Vector2>();
-                        }
+
+                    if(xNeighbor == 2 && yNeighbor == 2) {
+                        waypointBounds.add(new Rectangle(tileWidth * x + tileWidth / 3, tileHeight * y + tileHeight / 3, tileWidth / 3, tileHeight / 3));
+                        neighborPathTiles = new ArrayList<Vector2>();
+                        xNeighbor = 1;
+                        yNeighbor = 1;
+                        Gdx.app.log("waypoint", "x:" + waypointBounds.get(waypointBounds.size()-1).getX() + " y:" + waypointBounds.get(waypointBounds.size()-1).getY());
                     }
                 }
             }
