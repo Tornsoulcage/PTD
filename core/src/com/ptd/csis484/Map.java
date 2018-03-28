@@ -45,12 +45,11 @@ public class Map {
 
     private char mapArray[][] = new char[TILE_Y_COUNT][];
     private List<Rectangle> waypointBounds = new ArrayList<Rectangle>();
+    private Vector2 waypointStart = new Vector2();
 
 
 
     public Map(){
-
-
         createMap();
 
         camera = new OrthographicCamera();
@@ -72,21 +71,19 @@ public class Map {
                 if (mapArray[y][x] == 'x') {
                     Texture texture = manager.get("Tiles/grass_flowers_blue1.png");
                     game.batch.draw(texture, TILE_SIDE_LENGTH * x, TILE_SIDE_LENGTH * y);
-
                 }
                 //T represents tower tiles
                 if (mapArray[y][x] == 't') {
                     Texture texture = manager.get("Tiles/grass0-dirt-mix1.png");
                     game.batch.draw(texture, TILE_SIDE_LENGTH * x, TILE_SIDE_LENGTH * y);
                 }
-                //P represents path tiles
-                if (mapArray[y][x] == 'p') {
+                //P represents path tiles. The ending and starting tiles also get the path texture
+                if (mapArray[y][x] == 'p' || mapArray[y][x] == 's' || mapArray[y][x] == 'e') {
                     Texture texture = manager.get("Tiles/grass_full.png");
                     game.batch.draw(texture, TILE_SIDE_LENGTH * x, TILE_SIDE_LENGTH * y);
                 }
             }
         }
-
     }
 
     //Creates the array to represent each tile and it's attributes
@@ -102,43 +99,68 @@ public class Map {
         mapArray[8] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 'p', 'p', 'p', 'p', 't'};
         mapArray[9] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 't', 't', 't', 't', 't'};
 
-        List<Vector2>neighborPathTiles = new ArrayList<Vector2>();
-        int xNeighbor = 1;
-        int yNeighbor = 1;
-        for(int y = 0; y < mapArray.length; y++){
-            for(int x = 0; x < mapArray[y].length; x++){
-                if(mapArray[y][x] == 'p'){
-                    if(mapArray[y-1][x] == 'p'){
-                        neighborPathTiles.add(new Vector2(x,y));
+        //Loops through the array to find the spots on the path where we change direction
+        int xNeighbor = 0;
+        int yNeighbor = 0;
+        for(int y = 0; y < mapArray.length; y++) {
+            for (int x = 0; x < mapArray[y].length; x++) {
+                xNeighbor = 0;
+                yNeighbor = 0;
+
+                //If the index we are at is a path we check it's neighbors
+                //If the spots above/below and right/left of it are also paths we increment the respective counter
+                if (mapArray[y][x] == 'p') {
+                    if (mapArray[y - 1][x] == 'p') {
                         yNeighbor++;
                     }
-                    if(mapArray[y+1][x] == 'p'){
-                        neighborPathTiles.add(new Vector2(x,y));
+                    if (mapArray[y + 1][x] == 'p') {
                         yNeighbor++;
                     }
-                    if(mapArray[y][x-1] == 'p'){
-                        neighborPathTiles.add(new Vector2(x,y));
+                    if (mapArray[y][x - 1] == 'p') {
                         xNeighbor++;
                     }
-                    if(mapArray[y][x+1] == 'p'){
-                        neighborPathTiles.add(new Vector2(x,y));
+                    if (mapArray[y][x + 1] == 'p') {
                         xNeighbor++;
                     }
 
-                    if(xNeighbor == 2 && yNeighbor == 2) {
+                    //If we have one neighbor on x and one neigbor on y then this spot is a corner so we change direction here
+                    if (xNeighbor == 1 && yNeighbor == 1) {
                         waypointBounds.add(new Rectangle(tileWidth * x + tileWidth / 3, tileHeight * y + tileHeight / 3, tileWidth / 3, tileHeight / 3));
-                        neighborPathTiles = new ArrayList<Vector2>();
-                        xNeighbor = 1;
-                        yNeighbor = 1;
-                        Gdx.app.log("waypoint", "x:" + waypointBounds.get(waypointBounds.size()-1).getX() + " y:" + waypointBounds.get(waypointBounds.size()-1).getY());
                     }
+                }
+
+                //If our index is an s then that's our start tile
+                if(mapArray[y][x] == 's'){
+                    waypointStart.x = tileHeight * x;
+                    waypointStart.y = tileHeight * y + tileHeight/2;
+                }
+
+                //If our index is an e then that's our end tile
+                //We add one to the x index to push the waypoint outside the game bounds, then
+                //Then enemy will be removed while progressing towards that waypoint
+                if(mapArray[y][x] == 'e'){
+                    waypointBounds.add(new Rectangle(tileWidth * (x+1) + tileWidth / 3, tileHeight * y + tileHeight / 3, tileWidth / 3, tileHeight / 3));
                 }
             }
         }
     }
 
     //Getters and Setters for our variables
+    public OrthographicCamera getCamera() {
+        return camera;
+    }
 
+    public void setCamera(OrthographicCamera camera) {
+        this.camera = camera;
+    }
+
+    public Vector2 getWaypointStart() {
+        return waypointStart;
+    }
+
+    public void setWaypointStart(Vector2 waypointStart) {
+        this.waypointStart = waypointStart;
+    }
 
     public List<Rectangle> getWaypointBounds() {
         return waypointBounds;

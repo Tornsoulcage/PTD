@@ -28,7 +28,6 @@ public class Enemy {
 
     //Used to track the enemy's position and which waypoints have been passed
     private Vector2 position = new Vector2();
-    private Vector2 waypointStart = new Vector2();
 
     private Vector2 direction = new Vector2();
     private Vector2 velocity = new Vector2();
@@ -56,10 +55,10 @@ public class Enemy {
         this.health = 1;
         this.destroyed = false;
         this.goldValue = 0;
-        this.position = waypointStart;
+        this.position = new Vector2(0,0);
     }
 
-    public Enemy(enemyType type, int wave){
+    public Enemy(enemyType type, int wave, Map gameMap){
         //Different values are passed depending on the enemy type
         //Enemies stats increase by one percent each wave
         waveScale = (float)(wave * 1.01);
@@ -83,16 +82,11 @@ public class Enemy {
             this.type = type;
         }
 
-        //This is where the start tile currently is
-        waypointStart.x = 0;
-        waypointStart.y = tileHeight*3 - tileHeight/2;
-
         //Setting position equal to the start tile
-        position = new Vector2(waypointStart.x, waypointStart.y);
+        position = new Vector2(gameMap.getWaypointStart().x, gameMap.getWaypointStart().y);
 
         //Setting our initial bounds
         bounds = new Rectangle(position.x, position.y, 32, 32);
-
 
         //Marking the enemy undestroyed
         destroyed = false;
@@ -203,14 +197,6 @@ public class Enemy {
 
     public void setPosition(Vector2 position) {
         this.position = position;
-    }
-
-    public Vector2 getWaypointStart() {
-        return waypointStart;
-    }
-
-    public void setWaypointStart(Vector2 waypointStart) {
-        this.waypointStart = waypointStart;
     }
 
     public Vector2 getDirection() {

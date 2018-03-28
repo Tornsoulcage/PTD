@@ -114,13 +114,13 @@ public class GameScreen implements Screen, InputProcessor {
                 double enemyToSpawn = Math.random() * 3;
                 switch ((int) enemyToSpawn) {
                     case 0:
-                        enemyList.add(new Enemy(Enemy.enemyType.ROCK, waveNumber));
+                        enemyList.add(new Enemy(Enemy.enemyType.ROCK, waveNumber, gameMap));
                         break;
                     case 1:
-                        enemyList.add(new Enemy(Enemy.enemyType.PAPER, waveNumber));
+                        enemyList.add(new Enemy(Enemy.enemyType.PAPER, waveNumber, gameMap));
                         break;
                     case 2:
-                        enemyList.add(new Enemy(Enemy.enemyType.SCISSORS, waveNumber));
+                        enemyList.add(new Enemy(Enemy.enemyType.SCISSORS, waveNumber, gameMap));
                         break;
                 }
                 enemyCount++;
@@ -285,7 +285,7 @@ public class GameScreen implements Screen, InputProcessor {
 
         //Checking if the user taps the level up squares
         Rectangle touch = new Rectangle(screenX, gameMap.getDeviceHeight() - screenY, 1, 1);
-        if(touch.overlaps(gameMap.getGameBounds())){
+        if(touch.overlaps(gameMap.getLevelButton())){
             if(gold >= towerLevelCost) {
                 towerLevel++;
                 gold -= towerLevelCost;
@@ -296,9 +296,9 @@ public class GameScreen implements Screen, InputProcessor {
                 tower.setWaveTowerLevel(towerLevel);
             }
         }
-/*
+
         //If it is a tower tile we check other traits
-        if (cell.getTile().getId() == 1) {
+        if((gameMap.getMapArray()[(int)(9 - cellY)][(int)cellX]) == 't'){
             //Shows whether or not the cell in question is already occupied
             boolean occupiedCell = false;
 
@@ -313,8 +313,7 @@ public class GameScreen implements Screen, InputProcessor {
             if (!occupiedCell) {
                 spawnTower(cellX, cellY);
             }
-*/
-           boolean occupiedCell = true;
+
             //If the cell is occupied we change the tower type
             if(occupiedCell){
                 for(Tower tower : towerList){
@@ -332,7 +331,7 @@ public class GameScreen implements Screen, InputProcessor {
                     }
                 }
             }
-        //}
+        }
 
         return false;
     }
