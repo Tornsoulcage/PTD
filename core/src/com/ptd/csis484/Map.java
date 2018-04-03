@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -88,20 +89,29 @@ public class Map {
 
     //Creates the array to represent each tile and it's attributes
     private void createMap(){
-        mapArray[0] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 't', 't'};
-        mapArray[1] = new char[]{'t', 't', 't', 't', 't', 't', 't', 't', 'x', 'x', 'x', 'x', 't', 'p', 'e'};
-        mapArray[2] = new char[]{'s', 'p', 'p', 'p', 'p', 'p', 'p', 't', 't', 't', 't', 't', 't', 'p', 't'};
-        mapArray[3] = new char[]{'t', 't', 't', 't', 't', 't', 'p', 'p', 'p', 'p', 'p', 't', 't', 'p', 't'};
-        mapArray[4] = new char[]{'x', 'x', 'x', 'x', 'x', 't', 't', 't', 't', 't', 'p', 't', 't', 'p', 't'};
-        mapArray[5] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 'p', 't', 't', 'p', 't'};
-        mapArray[6] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 'p', 't', 't', 'p', 't'};
-        mapArray[7] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 'p', 't', 't', 'p', 't'};
-        mapArray[8] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 'p', 'p', 'p', 'p', 't'};
-        mapArray[9] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 't', 't', 't', 't', 't'};
+        mapArray[0] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 'p', 'p', 'p', 't', 't', 't'};
+        mapArray[1] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 'p', 't', 'p', 't', 'p', 'e'};
+        mapArray[2] = new char[]{'x', 'x', 'x', 'x', 'x', 't', 't', 't', 't', 'p', 't', 'p', 't', 'p', 't'};
+        mapArray[3] = new char[]{'t', 't', 't', 't', 't', 't', 'p', 'p', 'p', 'p', 't', 'p', 't', 'p', 't'};
+        mapArray[4] = new char[]{'s', 'p', 'p', 'p', 'p', 'p', 'p', 't', 't', 't', 't', 'p', 't', 'p', 't'};
+        mapArray[5] = new char[]{'t', 't', 't', 't', 't', 't', 't', 't', 'x', 'x', 't', 'p', 't', 'p', 't'};
+        mapArray[6] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 'p', 't', 'p', 't'};
+        mapArray[7] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 'p', 't', 'p', 't'};
+        mapArray[8] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 'p', 'p', 'p', 't'};
+        mapArray[9] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 't', 't', 't', 't'};
 
+        //Once our map is made we call the function to set the waypoints
+        setWaypoints();
+
+    }
+
+    //The idea here is to essentially walk the path through the array and mark each time we change
+    //directions. Every time we change directions we mark that as a waypoint
+    private void setWaypoints(){
         //Loops through the array to find the spots on the path where we change direction
-        int xNeighbor = 0;
-        int yNeighbor = 0;
+        int xNeighbor;
+        int yNeighbor;
+
         for(int y = 0; y < mapArray.length; y++) {
             for (int x = 0; x < mapArray[y].length; x++) {
                 xNeighbor = 0;
@@ -109,21 +119,31 @@ public class Map {
 
                 //If the index we are at is a path we check it's neighbors
                 //If the spots above/below and right/left of it are also paths we increment the respective counter
+                //For the purpose of neighbors we treat the end tile the same as a path
+                //If our check would push us outside the bounds of the map we ignore it
                 if (mapArray[y][x] == 'p') {
-                    if (mapArray[y - 1][x] == 'p') {
-                        yNeighbor++;
+                    if(y-1 > 0) {
+                        if (mapArray[y - 1][x] == 'p' || mapArray[y - 1][x] == 'e') {
+                            yNeighbor++;
+                        }
                     }
-                    if (mapArray[y + 1][x] == 'p') {
-                        yNeighbor++;
+                    if(y+1 < mapArray.length -1) {
+                        if (mapArray[y + 1][x] == 'p' || mapArray[y + 1][x] == 'e') {
+                            yNeighbor++;
+                        }
                     }
-                    if (mapArray[y][x - 1] == 'p') {
-                        xNeighbor++;
+                    if(x-1 >0) {
+                        if (mapArray[y][x - 1] == 'p' || mapArray[y][x - 1] == 'e') {
+                            xNeighbor++;
+                        }
                     }
-                    if (mapArray[y][x + 1] == 'p') {
-                        xNeighbor++;
+                    if(x+1 < mapArray[y].length -1) {
+                        if (mapArray[y][x + 1] == 'p' || mapArray[y][x + 1] == 'e') {
+                            xNeighbor++;
+                        }
                     }
 
-                    //If we have one neighbor on x and one neigbor on y then this spot is a corner so we change direction here
+                    //If we have one neighbor on x and one neighbor on y then this spot is a corner so we change direction here
                     if (xNeighbor == 1 && yNeighbor == 1) {
                         waypointBounds.add(new Rectangle(tileWidth * x + tileWidth / 3, tileHeight * y + tileHeight / 3, tileWidth / 3, tileHeight / 3));
                     }
@@ -132,7 +152,8 @@ public class Map {
                 //If our index is an s then that's our start tile
                 if(mapArray[y][x] == 's'){
                     waypointStart.x = tileHeight * x;
-                    waypointStart.y = tileHeight * y + tileHeight/2;
+                    waypointStart.y = tileHeight * y + tileHeight/3;
+                    waypointBounds.add(new Rectangle(tileWidth * x + tileWidth / 3, tileHeight * y + tileHeight / 3, tileWidth / 3, tileHeight / 3));
                 }
 
                 //If our index is an e then that's our end tile
@@ -143,6 +164,37 @@ public class Map {
                 }
             }
         }
+        boolean goAgain;
+        do {
+            goAgain = false;
+            for (int i = 0; i < waypointBounds.size(); i++) {
+                if (i != waypointBounds.size() - 1) {
+                    if (waypointBounds.get(i).x > waypointBounds.get(i + 1).x) {
+                        Rectangle temp = waypointBounds.get(i);
+                        waypointBounds.set(i, waypointBounds.get(i + 1));
+                        waypointBounds.set(i + 1, temp);
+                        goAgain = true;
+                    }
+                }
+            }
+        } while (goAgain);
+        Gdx.app.log("way", "" + waypointBounds);
+        do {
+            goAgain = false;
+            for(int i = 0; i < waypointBounds.size(); i++){
+                if (i != waypointBounds.size() - 1) {
+                    if (i % 2 != 0) {
+                        if (waypointBounds.get(i).y != waypointBounds.get(i - 1).y) {
+                            Rectangle temp = waypointBounds.get(i);
+                            waypointBounds.set(i, waypointBounds.get(i + 1));
+                            waypointBounds.set(i + 1, temp);
+                            goAgain = true;
+                        }
+                    }
+                }
+            }
+        } while(goAgain);
+
     }
 
     //Getters and Setters for our variables
