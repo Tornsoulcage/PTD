@@ -136,7 +136,6 @@ public class Enemy {
 
         //Updating the bounds for the enemy
         bounds = new Rectangle(position.x, position.y, 32, 32);
-
         //If the enemy crosses over the waypoint we count it as passed
         if(this.bounds.overlaps(gameMap.getWaypointBounds().get(currentWaypoint))){
             currentWaypoint++;

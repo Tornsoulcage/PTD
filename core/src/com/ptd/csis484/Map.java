@@ -47,6 +47,7 @@ public class Map {
     private char mapArray[][] = new char[TILE_Y_COUNT][];
     private List<Rectangle> waypointBounds = new ArrayList<Rectangle>();
     private Vector2 waypointStart = new Vector2();
+    private Vector2 waypointEnd = new Vector2();
 
 
 
@@ -89,16 +90,16 @@ public class Map {
 
     //Creates the array to represent each tile and it's attributes
     private void createMap(){
-        mapArray[0] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 'p', 'p', 'p', 't', 't', 't'};
-        mapArray[1] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 'p', 't', 'p', 't', 'p', 'e'};
-        mapArray[2] = new char[]{'x', 'x', 'x', 'x', 'x', 't', 't', 't', 't', 'p', 't', 'p', 't', 'p', 't'};
-        mapArray[3] = new char[]{'t', 't', 't', 't', 't', 't', 'p', 'p', 'p', 'p', 't', 'p', 't', 'p', 't'};
-        mapArray[4] = new char[]{'s', 'p', 'p', 'p', 'p', 'p', 'p', 't', 't', 't', 't', 'p', 't', 'p', 't'};
-        mapArray[5] = new char[]{'t', 't', 't', 't', 't', 't', 't', 't', 'x', 'x', 't', 'p', 't', 'p', 't'};
-        mapArray[6] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 'p', 't', 'p', 't'};
-        mapArray[7] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 'p', 't', 'p', 't'};
-        mapArray[8] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 'p', 'p', 'p', 't'};
-        mapArray[9] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 't', 't', 't', 't'};
+        mapArray[0] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 'x', 'x', 'x', 't', 't', 't'};
+        mapArray[1] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 'x', 't', 'x', 't', 'x', 'x'};
+        mapArray[2] = new char[]{'x', 'x', 'x', 'x', 'x', 't', 't', 't', 't', 'x', 't', 'x', 't', 'x', 'x'};
+        mapArray[3] = new char[]{'t', 't', 't', 't', 't', 't', 'x', 'x', 'x', 'x', 'x', 'x', 't', 'x', 'x'};
+        mapArray[4] = new char[]{'s', 'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p', 'e'};
+        mapArray[5] = new char[]{'t', 't', 't', 'x', 't', 'x', 't', 't', 'x', 'x', 't', 'x', 't', 'x', 'x'};
+        mapArray[6] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 'x', 't', 'x', 'x'};
+        mapArray[7] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 'x', 't', 'x', 'x'};
+        mapArray[8] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 'x', 'x', 'x', 'x'};
+        mapArray[9] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 'x', 'x', 'x', 'x'};
 
         //Once our map is made we call the function to set the waypoints
         setWaypoints();
@@ -122,22 +123,22 @@ public class Map {
                 //For the purpose of neighbors we treat the end tile the same as a path
                 //If our check would push us outside the bounds of the map we ignore it
                 if (mapArray[y][x] == 'p') {
-                    if(y-1 > 0) {
+                    if(y-1 >= 0) {
                         if (mapArray[y - 1][x] == 'p' || mapArray[y - 1][x] == 'e') {
                             yNeighbor++;
                         }
                     }
-                    if(y+1 < mapArray.length -1) {
+                    if(y+1 <= mapArray.length -1) {
                         if (mapArray[y + 1][x] == 'p' || mapArray[y + 1][x] == 'e') {
                             yNeighbor++;
                         }
                     }
-                    if(x-1 >0) {
+                    if(x-1 >= 0) {
                         if (mapArray[y][x - 1] == 'p' || mapArray[y][x - 1] == 'e') {
                             xNeighbor++;
                         }
                     }
-                    if(x+1 < mapArray[y].length -1) {
+                    if(x+1 <= mapArray[y].length -1) {
                         if (mapArray[y][x + 1] == 'p' || mapArray[y][x + 1] == 'e') {
                             xNeighbor++;
                         }
@@ -160,7 +161,9 @@ public class Map {
                 //We add one to the x index to push the waypoint outside the game bounds, then
                 //Then enemy will be removed while progressing towards that waypoint
                 if(mapArray[y][x] == 'e'){
-                    waypointBounds.add(new Rectangle(tileWidth * (x+1) + tileWidth / 3, tileHeight * y + tileHeight / 3, tileWidth / 3, tileHeight / 3));
+                    waypointEnd.x = tileWidth * (x+1) + tileWidth / 3;
+                    waypointEnd.y = tileHeight * y + tileHeight / 3;
+                    waypointBounds.add(new Rectangle(tileWidth * (x) + tileWidth / 3, tileHeight * y + tileHeight / 3, tileWidth / 3, tileHeight / 3 ));
                 }
             }
         }
@@ -178,22 +181,21 @@ public class Map {
                 }
             }
         } while (goAgain);
-        Gdx.app.log("way", "" + waypointBounds);
         do {
             goAgain = false;
             for(int i = 0; i < waypointBounds.size(); i++){
-                if (i != waypointBounds.size() - 1) {
-                    if (i % 2 != 0) {
-                        if (waypointBounds.get(i).y != waypointBounds.get(i - 1).y) {
-                            Rectangle temp = waypointBounds.get(i);
-                            waypointBounds.set(i, waypointBounds.get(i + 1));
-                            waypointBounds.set(i + 1, temp);
-                            goAgain = true;
-                        }
+                if (i % 2 != 0) {
+                    if (waypointBounds.get(i).y != waypointBounds.get(i - 1).y) {
+                        Rectangle temp = waypointBounds.get(i);
+                        waypointBounds.set(i, waypointBounds.get(i + 1));
+                        waypointBounds.set(i + 1, temp);
+                        goAgain = true;
                     }
                 }
             }
         } while(goAgain);
+
+        waypointBounds.add(new Rectangle(waypointEnd.x, waypointEnd.y, tileWidth / 3, tileHeight / 3));
 
     }
 
