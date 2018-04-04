@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-
 /**
  * Description: Represents the map the game is played on
  *
@@ -43,7 +42,7 @@ public class Map {
     private Rectangle gameBounds = new Rectangle(0,0, deviceWidth, deviceHeight);
     private Rectangle levelButton = new Rectangle(3*tileWidth, 8*tileHeight, 2*tileWidth, 2*tileHeight);
 
-
+    //Used to keep track of the map and where enemies should go
     private char mapArray[][] = new char[TILE_Y_COUNT][];
     private List<Rectangle> waypointBounds = new ArrayList<Rectangle>();
     private Vector2 waypointStart = new Vector2();
@@ -90,6 +89,7 @@ public class Map {
 
     //Creates the array to represent each tile and it's attributes
     private void createMap(){
+        /*
         mapArray[0] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 'x', 'x', 'x', 't', 't', 't'};
         mapArray[1] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 'x', 't', 'x', 't', 'x', 'x'};
         mapArray[2] = new char[]{'x', 'x', 'x', 'x', 'x', 't', 't', 't', 't', 'x', 't', 'x', 't', 'x', 'x'};
@@ -100,9 +100,87 @@ public class Map {
         mapArray[7] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 'x', 't', 'x', 'x'};
         mapArray[8] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 'x', 'x', 'x', 'x'};
         mapArray[9] = new char[]{'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 't', 'x', 'x', 'x', 'x'};
+        */
+
+        //First we finish creating the array
+        for(int i = 0; i < mapArray.length; i++){
+            mapArray[i] = new char[15];
+        }
+
+        //Pick a random starting spot
+        int start = (int) Math.random()*9;
+        mapArray[start][0] = 's';
+
+        int currentY = start;
+        int currentX = 0;
+
+        waypointStart.x = tileHeight * currentX;
+        waypointStart.y = tileHeight * currentY + tileHeight/3;
+        waypointBounds.add(new Rectangle(tileWidth * currentX + tileWidth / 3, tileHeight * currentY + tileHeight / 3, tileWidth / 3, tileHeight / 3));
+
+        boolean finished = false;
+        do {
+            //Our map length is 15 tiles. We also need a minimum of two tiles for every path,
+            //Which prevents paths from being next to each, there will always be a space between them.
+            int distance = (int) (Math.random()*(13 - currentX) + 2);
+            //First we loop through the x axis until we place a number of spots equal to the distance
+            for(int i = 1; i <= distance; i++){
+                //If we reach the end of the axis we want to place the end tile and end the loop
+                if(currentX + i == 14){
+                    mapArray[currentY][currentX + i] = 'e';
+                    finished = true;
+                    break;
+                } else {
+                    mapArray[currentY][currentX + i] = 'p';
+                }
+            }
+            waypointBounds.add(new Rectangle(tileWidth * currentX + tileWidth / 3, tileHeight * currentY + tileHeight / 3, tileWidth / 3, tileHeight / 3));
+
+            Gdx.app.log("spotDistanceX", "" + distance);
+
+            currentX += (distance);
+
+            //We roll a random number to decide wether we will go up or down
+            double direction = Math.random();
+
+            if(!finished) {
+                //Less than .5 is down
+                if(currentY == 0){
+                    direction = .2;
+                }
+                if(currentY == 9){
+                    direction = .7;
+                }
+                if (direction < .5) {
+                    //Same as the xaxis but with a smaller length for the y axis
+                    distance = (int) (Math.random() * (10 - currentY));
+
+                    for (int i = 1; i <= distance; i++) {
+                        mapArray[currentY + i][currentX] = 'p';
+                    }
+                    Gdx.app.log("spotDistanceUP", "" + distance);
+
+                    currentY += (distance);
+                //Otherwise we go up
+                } else {
+                    //Same as the xaxis but with a smaller length for the y axis
+                    distance = (int) (Math.random() * (currentY));
+
+                    for (int i = 1; i <= distance; i++) {
+                        mapArray[currentY - i][currentX] = 'p';
+                    }
+                    Gdx.app.log("spotDistanceDOWN", "" + distance);
+                    currentY -= distance;
+                }
+                waypointBounds.add(new Rectangle(tileWidth * currentX + tileWidth / 3, tileHeight * currentY + tileHeight / 3, tileWidth / 3, tileHeight / 3));
+
+            }
+            Gdx.app.log("spot", "x: " + currentX + " y: " + currentY);
+
+        } while (!finished);
 
         //Once our map is made we call the function to set the waypoints
-        setWaypoints();
+        //setWaypoints();
 
     }
 
@@ -160,6 +238,7 @@ public class Map {
                 //If our index is an e then that's our end tile
                 //We add one to the x index to push the waypoint outside the game bounds, then
                 //Then enemy will be removed while progressing towards that waypoint
+                //We also a waypoint at the actual end tile to line the enemy up with the exit
                 if(mapArray[y][x] == 'e'){
                     waypointEnd.x = tileWidth * (x+1) + tileWidth / 3;
                     waypointEnd.y = tileHeight * y + tileHeight / 3;
@@ -167,9 +246,13 @@ public class Map {
                 }
             }
         }
+
+        //These loops sort the waypoints so they fall in the right order
         boolean goAgain;
         do {
             goAgain = false;
+
+            //First we sort by the x location. We assume a left to right movement so sort ascending
             for (int i = 0; i < waypointBounds.size(); i++) {
                 if (i != waypointBounds.size() - 1) {
                     if (waypointBounds.get(i).x > waypointBounds.get(i + 1).x) {
@@ -181,8 +264,15 @@ public class Map {
                 }
             }
         } while (goAgain);
+
         do {
             goAgain = false;
+
+            //Every other waypoint changes our direction to up or down but since they are on the
+            //same x spot we need to make sure the right one comes first.
+            //We do this by making sure this waypoint's y is the same as the previous one, i.e.
+            //They are in line with eachother. If they are not then we swap this waypoint with the one
+            //in front of it, which will align it properly.
             for(int i = 0; i < waypointBounds.size(); i++){
                 if (i % 2 != 0) {
                     if (waypointBounds.get(i).y != waypointBounds.get(i - 1).y) {
@@ -195,8 +285,8 @@ public class Map {
             }
         } while(goAgain);
 
+        //After the waypoints are sorted we add in the final waypoint, the exit one.
         waypointBounds.add(new Rectangle(waypointEnd.x, waypointEnd.y, tileWidth / 3, tileHeight / 3));
-
     }
 
     //Getters and Setters for our variables

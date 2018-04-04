@@ -23,12 +23,11 @@ public class Enemy {
     private double health;
     private boolean destroyed;
     private float waveScale = 1;
-    private int currentWaypoint = 0;
     private int goldValue = 0;
 
     //Used to track the enemy's position and which waypoints have been passed
     private Vector2 position = new Vector2();
-
+    private int currentWaypoint = 0;
     private Vector2 direction = new Vector2();
     private Vector2 velocity = new Vector2();
     private Vector2 targetPosition = new Vector2();
@@ -136,6 +135,7 @@ public class Enemy {
 
         //Updating the bounds for the enemy
         bounds = new Rectangle(position.x, position.y, 32, 32);
+
         //If the enemy crosses over the waypoint we count it as passed
         if(this.bounds.overlaps(gameMap.getWaypointBounds().get(currentWaypoint))){
             currentWaypoint++;
