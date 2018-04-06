@@ -38,7 +38,7 @@ public class Tower {
     private int waveTowerLevel = 1;
 
     //Sets a default enemy to be the target
-    private Enemy target = new Enemy(Enemy.enemyType.ROCK, 1);
+    private Enemy target = new Enemy();
 
     //Variables to help find the closet enemy
     private double targetXDist;

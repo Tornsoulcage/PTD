@@ -23,15 +23,11 @@ public class Enemy {
     private double health;
     private boolean destroyed;
     private float waveScale = 1;
-    private int currentWaypoint = 0;
     private int goldValue = 0;
 
     //Used to track the enemy's position and which waypoints have been passed
     private Vector2 position = new Vector2();
-    private Vector2 waypointStart = new Vector2();
-
-    private List<Rectangle> waypointBounds = new ArrayList<Rectangle>();
-
+    private int currentWaypoint = 0;
     private Vector2 direction = new Vector2();
     private Vector2 velocity = new Vector2();
     private Vector2 targetPosition = new Vector2();
@@ -58,10 +54,10 @@ public class Enemy {
         this.health = 1;
         this.destroyed = false;
         this.goldValue = 0;
-        this.position = waypointStart;
+        this.position = new Vector2(0,0);
     }
 
-    public Enemy(enemyType type, int wave){
+    public Enemy(enemyType type, int wave, Map gameMap){
         //Different values are passed depending on the enemy type
         //Enemies stats increase by one percent each wave
         waveScale = (float)(wave * 1.01);
@@ -85,31 +81,17 @@ public class Enemy {
             this.type = type;
         }
 
-        //This is where the start tile currently is
-        waypointStart.x = 0;
-        waypointStart.y = tileHeight*3 - tileHeight/2;
-
         //Setting position equal to the start tile
-        position = new Vector2(waypointStart.x, waypointStart.y);
+        position = new Vector2(gameMap.getWaypointStart().x, gameMap.getWaypointStart().y);
 
         //Setting our initial bounds
         bounds = new Rectangle(position.x, position.y, 32, 32);
-
 
         //Marking the enemy undestroyed
         destroyed = false;
 
         //Gold value for destroying an enemy
         goldValue = 10;
-
-        //Setting our waypoints for the test map
-        waypointBounds.add(new Rectangle(tileWidth*6 + tileWidth/3, tileHeight*2 + tileHeight/3, tileWidth/3 , tileHeight/3));
-        waypointBounds.add(new Rectangle(tileWidth*6 + tileWidth/3, tileHeight*6 + tileHeight/3, tileWidth/3, tileHeight/3));
-        waypointBounds.add(new Rectangle(tileWidth*10 + tileWidth/3, tileHeight*6 + tileHeight/3, tileWidth/3, tileHeight/3));
-        waypointBounds.add(new Rectangle(tileWidth*10 + tileWidth/3, tileHeight*1 + tileHeight/3, tileWidth/3, tileHeight/3));
-        waypointBounds.add(new Rectangle(tileWidth*13 + tileWidth/3, tileHeight*1 + tileHeight/3, tileWidth/3, tileHeight/3));
-        waypointBounds.add(new Rectangle(tileWidth*13 + tileWidth/3, tileHeight*8 + tileHeight/3, tileWidth/3, tileHeight/3));
-        waypointBounds.add(new Rectangle(tileWidth*15 + tileWidth/3, tileHeight*8 + tileHeight/3, tileWidth/3, tileHeight/3));
     }
 
     //Creates the enemy and places it
@@ -132,7 +114,7 @@ public class Enemy {
     }
 
     //Moves the enemy around the map
-    public void update(float delta, List<Bullet> bulletList) {
+    public void update(float delta, List<Bullet> bulletList, Map gameMap) {
         //Iterating over the bullets to check for collisions
         List<Bullet> toRemove = new ArrayList<Bullet>();
         for (Bullet bullet : bulletList) {
@@ -145,7 +127,7 @@ public class Enemy {
         bulletList.removeAll(toRemove);
 
         //Setting our movement vectors
-        this.targetPosition = new Vector2(waypointBounds.get(currentWaypoint).getX(), waypointBounds.get(currentWaypoint).getY());
+        this.targetPosition = new Vector2(gameMap.getWaypointBounds().get(currentWaypoint).getX(), gameMap.getWaypointBounds().get(currentWaypoint).getY());
         this.direction.set(targetPosition).sub(position).nor();
         velocity.set(direction).scl(this.speed);
 
@@ -155,7 +137,7 @@ public class Enemy {
         bounds = new Rectangle(position.x, position.y, 32, 32);
 
         //If the enemy crosses over the waypoint we count it as passed
-        if(this.bounds.overlaps(waypointBounds.get(currentWaypoint))){
+        if(this.bounds.overlaps(gameMap.getWaypointBounds().get(currentWaypoint))){
             currentWaypoint++;
         }
     }
@@ -214,22 +196,6 @@ public class Enemy {
 
     public void setPosition(Vector2 position) {
         this.position = position;
-    }
-
-    public Vector2 getWaypointStart() {
-        return waypointStart;
-    }
-
-    public void setWaypointStart(Vector2 waypointStart) {
-        this.waypointStart = waypointStart;
-    }
-
-    public List<Rectangle> getWaypointBounds() {
-        return waypointBounds;
-    }
-
-    public void setWaypointBounds(List<Rectangle> waypointBounds) {
-        this.waypointBounds = waypointBounds;
     }
 
     public Vector2 getDirection() {
