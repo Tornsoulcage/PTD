@@ -332,8 +332,6 @@ public class GameScreen implements Screen, InputProcessor {
             }
         }
 
-        game.setScreen(new GameScreen(game));
-        this.dispose();
         return false;
     }
 
