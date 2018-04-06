@@ -97,7 +97,7 @@ public class MainMenuScreen implements Screen, InputProcessor {
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         //Changes the screen to the actual game upon taping
-        game.setScreen(new GameScreen(game));
+        game.setScreen(new TutorialScreen(game));
         dispose();
         return false;
     }
