@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 //TODO Add ability to save user progress
-//TODO Add procedural generated maps
 
 /**
  * Description: Runs the actual game
@@ -333,6 +332,8 @@ public class GameScreen implements Screen, InputProcessor {
             }
         }
 
+        game.setScreen(new GameScreen(game));
+        this.dispose();
         return false;
     }
 
