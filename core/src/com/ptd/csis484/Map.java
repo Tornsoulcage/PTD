@@ -22,7 +22,6 @@ public class Map {
     //Stats on the tile sizes for the map
     private final int TILE_X_COUNT = 15;
     private final int TILE_Y_COUNT = 10;
-    private final int TOTAL_PATH_COUNT = 18;
     private final int TILE_SIDE_LENGTH = 32;
 
     private AssetManager manager = new AssetManager();

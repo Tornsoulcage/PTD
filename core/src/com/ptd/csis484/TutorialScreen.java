@@ -20,11 +20,16 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 //Represents the Main Menu/Start Screen
 public class TutorialScreen implements Screen, InputProcessor {
     private final PTD game;
+
     private OrthographicCamera camera;
     private int viewportWidth = 480;
     private int viewportHeight = 320;
+    private float deviceHeight = Gdx.graphics.getHeight();
+    private float deviceWidth = Gdx.graphics.getWidth();
     private ShapeRenderer shapeRenderer;
     private GlyphLayout glyphLayout;
+    private float scaleHPercent = viewportHeight/deviceHeight;
+    private float scaleWPercent = viewportWidth/deviceWidth;
 
     //Represents the tutorial screen
     public TutorialScreen(final PTD game){
@@ -37,9 +42,13 @@ public class TutorialScreen implements Screen, InputProcessor {
     //Just draws a simple tutorial screen
     @Override
     public void render(float delta){
-        Gdx.gl.glClearColor(0,0,0.2f,1);
+        //Setting the background to a dark blue color
+        Gdx.gl.glClearColor(0,0,0.4f,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        //We use SCISSORS Enemy as our default text because it's the longest string we have
+        //We use this to get the length of the string, which is used while placing the strings and
+        //tile shapes
         glyphLayout.setText(game.font, "SCISSORS Enemy");
 
         shapeRenderer = new ShapeRenderer();
@@ -47,21 +56,28 @@ public class TutorialScreen implements Screen, InputProcessor {
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
+        //Drawing the various squares to represent the enemies and towers we use
         shapeRenderer.setColor(Color.RED);
-        shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.rect(0, game.font.getLineHeight(), 30,30);
+        shapeRenderer.rect(45/scaleWPercent, (viewportHeight - 14*game.font.getLineHeight() + 9)/scaleHPercent, 30,30);
+
         shapeRenderer.setColor(Color.BLUE);
-        shapeRenderer.rect(0, viewportHeight - 12*game.font.getLineHeight(), 30,30);
+        shapeRenderer.rect(45/scaleWPercent,  (viewportHeight - 13*game.font.getLineHeight() + 9)/scaleHPercent, 30,30);
+
         shapeRenderer.setColor(Color.BLACK);
-        shapeRenderer.rect(0, viewportHeight - 13*game.font.getLineHeight(), 30,30);
+        shapeRenderer.rect(45/scaleWPercent, (viewportHeight - 12*game.font.getLineHeight() + 9)/scaleHPercent, 30,30);
+
         shapeRenderer.setColor(Color.BROWN);
-        shapeRenderer.rect(90 + glyphLayout.width, viewportHeight - 11*game.font.getLineHeight(), 30,30);
+        shapeRenderer.rect((105 + glyphLayout.width)/scaleWPercent, (viewportHeight - 12*game.font.getLineHeight() + 9)/scaleHPercent, 30,30);
+
         shapeRenderer.setColor(Color.LIME);
-        shapeRenderer.rect(90 + glyphLayout.width, viewportHeight - 12*game.font.getLineHeight(), 30,30);
+        shapeRenderer.rect((105 + glyphLayout.width)/scaleWPercent,  (viewportHeight - 13*game.font.getLineHeight() + 9)/scaleHPercent, 30,30);
+
         shapeRenderer.setColor(Color.FOREST);
-        shapeRenderer.rect(90 + glyphLayout.width, viewportHeight - 13*game.font.getLineHeight(), 30,30);
-        //shapeRenderer.setColor(Color.valueOf("#91fc3a"));
-        //shapeRenderer.rect(0, viewportHeight - 10*game.font.getLineHeight(), 30,30);
+        shapeRenderer.rect((105 + glyphLayout.width)/scaleWPercent, (viewportHeight - 14*game.font.getLineHeight() + 9)/scaleHPercent, 30,30);
+
+        shapeRenderer.setColor(Color.valueOf("#91fc3a"));
+        shapeRenderer.rect(45/scaleWPercent, (viewportHeight - 15*game.font.getLineHeight() + 9)/scaleHPercent, 30,30);
+
         shapeRenderer.end();
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
@@ -84,6 +100,7 @@ public class TutorialScreen implements Screen, InputProcessor {
         game.font.draw(game.batch, "PATH Tile", 120 + glyphLayout.width, viewportHeight - 11*game.font.getLineHeight());
         game.font.draw(game.batch, "TOWER Tile", 120 + glyphLayout.width, viewportHeight - 12*game.font.getLineHeight());
         game.font.draw(game.batch, "BACKGROUND Tile", 120 + glyphLayout.width, viewportHeight - 13*game.font.getLineHeight());
+        game.font.draw(game.batch, "BULLET", 60, viewportHeight - 14*game.font.getLineHeight());
         game.batch.end();
     }
 
