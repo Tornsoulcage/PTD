@@ -34,7 +34,7 @@ public class Enemy {
 
     //There are only three types of enemies
     //These determine what values go into the above variables
-    public enum enemyType {ROCK, PAPER, SCISSORS};
+    public enum enemyType {ROCK, PAPER, SCISSORS}
 
     private enemyType type;
 
@@ -129,9 +129,13 @@ public class Enemy {
         //Setting our movement vectors
         this.targetPosition = new Vector2(gameMap.getWaypointBounds().get(currentWaypoint).getX(), gameMap.getWaypointBounds().get(currentWaypoint).getY());
         this.direction.set(targetPosition).sub(position).nor();
-        velocity.set(direction).scl(this.speed);
+        velocity.set(direction);
 
-        position.add(velocity);
+        //Moves the enemy in the direction a number of times equal to it's speed.
+        //Doing it this way helps to prevent the enemies from jumping forwards when they get faster.
+        for(int i = 0; i < speed; i++){
+            position.add(velocity);
+        }
 
         //Updating the bounds for the enemy
         bounds = new Rectangle(position.x, position.y, 32, 32);

@@ -32,7 +32,7 @@ public class Bullet {
         this.damage = source.getScaledDamage();
         this.target = target;
 
-        //10 is the default speed for now
+        //How many pixels the bullet passes each frame
         this.speed = 20;
 
         //Updating our movement vectors
