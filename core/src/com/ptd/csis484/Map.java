@@ -140,11 +140,11 @@ public class Map {
             //Then we add that distance to our x to shift our position to where we ended
             currentX += (distance);
 
-            //We roll a random number to decide wether we will go up or down
-            double direction = Math.random();
-
             //If we reach the end tile we don't want to go up or down
             if(!finished) {
+                //We roll a random number to decide wether we will go up or down
+                double direction = Math.random();
+
                 //These prevent us from picking down or up when we on the boundary of the map
                 if(currentY == 0){
                     direction = .2;
@@ -237,8 +237,9 @@ public class Map {
         setWaypoints();
     }
 
-    //The idea here is to essentially walk the path through the array and mark each time we change
-    //directions. Every time we change directions we mark that as a waypoint
+    //The goal here to loop through the whole of the map array and find every path tile that has a
+    //neighbor on both the yaxis and xaxis, which means that we change directions at that tile so
+    //we mark it as a waypoint.
     private void setWaypoints(){
         //Loops through the array to find the spots on the path where we change direction
         int xNeighbor;

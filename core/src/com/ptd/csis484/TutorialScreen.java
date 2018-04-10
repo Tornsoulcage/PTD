@@ -24,10 +24,13 @@ public class TutorialScreen implements Screen, InputProcessor {
     private OrthographicCamera camera;
     private int viewportWidth = 480;
     private int viewportHeight = 320;
+
     private float deviceHeight = Gdx.graphics.getHeight();
     private float deviceWidth = Gdx.graphics.getWidth();
+
     private ShapeRenderer shapeRenderer;
     private GlyphLayout glyphLayout;
+    
     private float scaleHPercent = viewportHeight/deviceHeight;
     private float scaleWPercent = viewportWidth/deviceWidth;
 
@@ -76,9 +79,10 @@ public class TutorialScreen implements Screen, InputProcessor {
         shapeRenderer.rect((105 + glyphLayout.width)/scaleWPercent, (viewportHeight - 14*game.font.getLineHeight() + 9)/scaleHPercent, 30,30);
 
         shapeRenderer.setColor(Color.valueOf("#91fc3a"));
-        shapeRenderer.rect(45/scaleWPercent, (viewportHeight - 15*game.font.getLineHeight() + 9)/scaleHPercent, 30,30);
+        shapeRenderer.circle(49/scaleWPercent, (viewportHeight - 15*game.font.getLineHeight() + 12)/scaleHPercent, 15);
 
         shapeRenderer.end();
+
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
 

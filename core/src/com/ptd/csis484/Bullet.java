@@ -47,8 +47,7 @@ public class Bullet {
     public void render(ShapeRenderer renderer){
         renderer.setColor(Color.GREEN);
         renderer.set(ShapeRenderer.ShapeType.Filled);
-        renderer.rect(position.x, position.y, 10,10);
-
+        renderer.circle(position.x, position.y, 5);
     }
 
     public void update(float delta) {
