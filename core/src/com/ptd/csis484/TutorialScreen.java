@@ -30,7 +30,7 @@ public class TutorialScreen implements Screen, InputProcessor {
 
     private ShapeRenderer shapeRenderer;
     private GlyphLayout glyphLayout;
-    
+
     private float scaleHPercent = viewportHeight/deviceHeight;
     private float scaleWPercent = viewportWidth/deviceWidth;
 

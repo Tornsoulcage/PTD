@@ -34,6 +34,7 @@ public class Tower {
 
     private int towerLevel;
     private long timeCreated;
+    private long bulletFiredTime;
 
     private int waveTowerLevel = 1;
 
@@ -305,5 +306,13 @@ public class Tower {
 
     public void setWaveTowerLevel(int waveTowerLevel) {
         this.waveTowerLevel = waveTowerLevel;
+    }
+
+    public long getBulletFiredTime() {
+        return bulletFiredTime;
+    }
+
+    public void setBulletFiredTime(long bulletFiredTime) {
+        this.bulletFiredTime = bulletFiredTime;
     }
 }

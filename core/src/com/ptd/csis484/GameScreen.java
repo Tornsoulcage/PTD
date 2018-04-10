@@ -54,9 +54,8 @@ public class GameScreen implements Screen, InputProcessor {
     private List<Vector2> occupiedCells = new ArrayList<Vector2>();
     private List<Bullet> bulletList = new ArrayList<Bullet>();
 
-    //Counts the number of times render has been called
-    //Used to space out the spawning of enemies and bullets
-    private int renderCount = 0;
+    private long bulletFiredTime;
+    private long enemySpawnedTime;
 
     private int gold = 100;
     private int remainingLife = 20;
@@ -98,16 +97,17 @@ public class GameScreen implements Screen, InputProcessor {
             tower.update(enemyList, delta);
             tower.render(shapeRenderer);
 
-            //Every 30 renders wo spawn a new bullet, about 2 times a second
-            if (renderCount % 30 == 0) {
+            //Spawns a new bullet every half second.
+            if (System.currentTimeMillis() - tower.getBulletFiredTime() >= 500) {
                 if (!enemyList.isEmpty()) {
                     bulletList.add(new Bullet(tower.getScaledDamage(), tower.getTarget(), tower));
+                    tower.setBulletFiredTime(System.currentTimeMillis());
                 }
             }
         }
 
-        //Spawns a new enemy every 40 renders
-        if (renderCount % 40 == 0) {
+        //Spawns a new enemy every second
+        if (System.currentTimeMillis() - enemySpawnedTime >= 1000) {
             //Wave size is 20 enemies so we stop once we get there
             if (enemyCount != 20) {
                 double enemyToSpawn = Math.random() * 3;
@@ -123,6 +123,7 @@ public class GameScreen implements Screen, InputProcessor {
                         break;
                 }
                 enemyCount++;
+                enemySpawnedTime = System.currentTimeMillis();
             }
         }
 
@@ -169,14 +170,13 @@ public class GameScreen implements Screen, InputProcessor {
         }
         bulletList.removeAll(toBulletRemove);
 
-        //If all of our enemies have been destroyed and we've reached the end of the wave we remove all of our bullets
+        //If all of our enemies have been destroyed and we've reached the end of the wave so
+        //we reset our enemy count and restart
         if (enemyList.isEmpty() && enemyCount == 20) {
             waveNumber++;
             enemyCount = 0;
         }
 
-        //Incrementing the render count and ending the shape renderer
-        renderCount++;
         shapeRenderer.end();
 
         //Message strings for the user
