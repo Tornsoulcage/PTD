@@ -58,20 +58,20 @@ public class Enemy {
     public Enemy(enemyType type, int wave, Map gameMap){
         //Different values are passed depending on the enemy type
         //Enemies stats increase by one percent each wave
-        waveScale = (float)(wave * 1.01);
+        waveScale = (float) (1 + wave * .01);
 
         if(type == enemyType.ROCK) {
-            this.speed = 1 * waveScale;
+            this.speed = 2 * waveScale;
             this.health = 5* waveScale;
             this.type = type;
         }
         if(type == enemyType.SCISSORS){
-            this.speed = 3* waveScale;
+            this.speed = 5* waveScale;
             this.health = 3* waveScale;
             this.type = type;
         }
         if(type == enemyType.PAPER){
-            this.speed = 2* waveScale;
+            this.speed = 3* waveScale;
             this.health = 3* waveScale;
             this.type = type;
         }
