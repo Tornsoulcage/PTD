@@ -113,7 +113,7 @@ public class Tower {
     }
 
     //Updates the tower to get a new target
-    public void update(List<Enemy> enemyList, float delta) {
+    public void update(List<Enemy> enemyList) {
         //Updating our damage to the current waveTowerLevel value
         this.scaledDamage = this.baseDamage * waveTowerLevel;
         //Variable to hold temp distance for each enemy

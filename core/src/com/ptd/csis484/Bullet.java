@@ -51,7 +51,7 @@ public class Bullet {
 
     //Moves our bullet towards the enemy
     //Bullets are homing so they constantly adjust direction to ensure they hit the target
-    public void update(float delta) {
+    public void update() {
         //If our target was destroyed we just continue going in the last known direction until the
         //bullet exits the map
         if(!target.isDestroyed()){

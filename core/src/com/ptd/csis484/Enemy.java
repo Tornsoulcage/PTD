@@ -107,7 +107,7 @@ public class Enemy {
     }
 
     //Moves the enemy around the map
-    public void update(float delta, List<Bullet> bulletList, Map gameMap) {
+    public void update(List<Bullet> bulletList, Map gameMap) {
         //Iterating over the bullets to check for collisions
         List<Bullet> toRemove = new ArrayList<Bullet>();
         for (Bullet bullet : bulletList) {

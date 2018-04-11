@@ -92,22 +92,41 @@ public class GameScreen implements Screen, InputProcessor {
         shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.rect(gameMap.getLevelButton().getX(), gameMap.getLevelButton().getY(), gameMap.getLevelButton().getWidth(), gameMap.getLevelButton().getHeight());
 
-        //Looping through the towers and updating and drawing them
-        for (Tower tower : towerList) {
-            tower.update(enemyList, delta);
-            tower.render(shapeRenderer);
+        //These functions spawn and update the necessary elements for the game
+        updateTowers();
+        spawnEnemy();
+        updateEnemies();
+        updateBullets();
 
-            //Spawns a new bullet every half second.
-            if (System.currentTimeMillis() - tower.getBulletFiredTime() >= 500) {
-                if (!enemyList.isEmpty()) {
-                    if(tower.getTarget().getType().equals(tower.getType())) {
-                        bulletList.add(new Bullet(tower.getTarget(), tower));
-                        tower.setBulletFiredTime(System.currentTimeMillis());
-                    }
-                }
-            }
+        //If all of our enemies have been destroyed and we've reached the end of the wave so
+        //we reset our enemy count and restart
+        if (enemyList.isEmpty() && enemyCount == 20) {
+            waveNumber++;
+            enemyCount = 0;
         }
 
+        shapeRenderer.end();
+
+        //Message strings for the user
+        String goldString = "Gold = " + gold;
+        String waveString = "Wave = " + waveNumber;
+        String lifeString = "Life = " + remainingLife;
+        String levelString = "Lvl = " + towerLevel;
+        String costString = "Cost = " + towerLevelCost;
+
+        //Displaying the strings in the top left corner of the screen for the user
+        game.batch.setProjectionMatrix(camera.combined);
+        game.batch.begin();
+        game.font.draw(game.batch, goldString, 0, gameMap.getViewportHeight());
+        game.font.draw(game.batch, waveString, 0, gameMap.getViewportHeight() - (gameMap.getTILE_SIDE_LENGTH() - game.font.getXHeight()));
+        game.font.draw(game.batch, lifeString, 0, gameMap.getViewportHeight() - 2*(gameMap.getTILE_SIDE_LENGTH() - game.font.getXHeight()));
+        game.font.draw(game.batch, levelString, 3*gameMap.getTILE_SIDE_LENGTH(), gameMap.getViewportHeight() - gameMap.getTILE_SIDE_LENGTH() + 2*game.font.getXHeight());
+        game.font.draw(game.batch, costString, 3*gameMap.getTILE_SIDE_LENGTH(), gameMap.getViewportHeight() - gameMap.getTILE_SIDE_LENGTH() - game.font.getXHeight());
+        game.batch.end();
+    }
+
+    //Function to spawn a new enemy
+    private void spawnEnemy(){
         //Spawns a new enemy every second
         if (System.currentTimeMillis() - enemySpawnedTime >= 1000) {
             //If we havent reached the max number of enemies for the wave yet
@@ -169,24 +188,27 @@ public class GameScreen implements Screen, InputProcessor {
                 enemySpawnedTime = System.currentTimeMillis();
             }
         }
+    }
 
+    //Function to update the enemies
+    private void updateEnemies(){
         //Update loop for all of the enemies
         List<Enemy> toEnemyRemove = new ArrayList<Enemy>();
         for (Enemy enemy : enemyList) {
             //Updates the enemies with the current list of bullets
-            enemy.update(delta, bulletList, gameMap);
+            enemy.update(bulletList, gameMap);
 
             //If our enemy leaves the bounds of the screen we remove it from the game
             if (!gameMap.getGameBounds().contains(enemy.getBounds())) {
-               toEnemyRemove.add(enemy);
-               enemy.setDestroyed(true);
-               remainingLife--;
+                toEnemyRemove.add(enemy);
+                enemy.setDestroyed(true);
+                remainingLife--;
 
-               //If the user's life total has reached zero we end the game
-               if(remainingLife <= 0){
-                   game.setScreen(new GameOverScreen(game));
-                   dispose();
-               }
+                //If the user's life total has reached zero we end the game
+                if(remainingLife <= 0){
+                    game.setScreen(new GameOverScreen(game));
+                    dispose();
+                }
             } else if (enemy.getHealth() <= 0) {
                 enemy.setDestroyed(true);
                 gold += enemy.getGoldValue();
@@ -197,11 +219,33 @@ public class GameScreen implements Screen, InputProcessor {
 
         }
         enemyList.removeAll(toEnemyRemove);
+    }
 
+    //Function to update the towers
+    private void updateTowers(){
+        //Looping through the towers and updating and drawing them
+        for (Tower tower : towerList) {
+            tower.update(enemyList);
+            tower.render(shapeRenderer);
+
+            //Spawns a new bullet every half second.
+            if (System.currentTimeMillis() - tower.getBulletFiredTime() >= 500) {
+                if (!enemyList.isEmpty()) {
+                    if(tower.getTarget().getType().equals(tower.getType())) {
+                        bulletList.add(new Bullet(tower.getTarget(), tower));
+                        tower.setBulletFiredTime(System.currentTimeMillis());
+                    }
+                }
+            }
+        }
+    }
+
+    //Function to update the bullets
+    private void updateBullets(){
         //Update loop for all of the bullets
         List<Bullet> toBulletRemove = new ArrayList<Bullet>();
         for (Bullet bullet : bulletList) {
-            bullet.update(delta);
+            bullet.update();
 
             //If our bullet is out of bounds
             if (!gameMap.getGameBounds().contains(bullet.getBounds())) {
@@ -212,36 +256,10 @@ public class GameScreen implements Screen, InputProcessor {
 
         }
         bulletList.removeAll(toBulletRemove);
-
-        //If all of our enemies have been destroyed and we've reached the end of the wave so
-        //we reset our enemy count and restart
-        if (enemyList.isEmpty() && enemyCount == 20) {
-            waveNumber++;
-            enemyCount = 0;
-        }
-
-        shapeRenderer.end();
-
-        //Message strings for the user
-        String goldString = "Gold = " + gold;
-        String waveString = "Wave = " + waveNumber;
-        String lifeString = "Life = " + remainingLife;
-        String levelString = "Lvl = " + towerLevel;
-        String costString = "Cost = " + towerLevelCost;
-
-        //Displaying the strings in the top left corner of the screen for the user
-        game.batch.setProjectionMatrix(camera.combined);
-        game.batch.begin();
-        game.font.draw(game.batch, goldString, 0, gameMap.getViewportHeight());
-        game.font.draw(game.batch, waveString, 0, gameMap.getViewportHeight() - (gameMap.getTILE_SIDE_LENGTH() - game.font.getXHeight()));
-        game.font.draw(game.batch, lifeString, 0, gameMap.getViewportHeight() - 2*(gameMap.getTILE_SIDE_LENGTH() - game.font.getXHeight()));
-        game.font.draw(game.batch, levelString, 3*gameMap.getTILE_SIDE_LENGTH(), gameMap.getViewportHeight() - gameMap.getTILE_SIDE_LENGTH() + 2*game.font.getXHeight());
-        game.font.draw(game.batch, costString, 3*gameMap.getTILE_SIDE_LENGTH(), gameMap.getViewportHeight() - gameMap.getTILE_SIDE_LENGTH() - game.font.getXHeight());
-        game.batch.end();
     }
 
     //Spawns a tower on the requested tile
-    public void spawnTower(float cellX, float cellY){
+    private void spawnTower(float cellX, float cellY){
         double towerToSpawn = Math.random() * 3;
         Tower tower = new Tower();
         switch ((int) towerToSpawn) {
@@ -264,7 +282,7 @@ public class GameScreen implements Screen, InputProcessor {
     }
 
     //Changes the type of the tower in question
-    public void changeTowerType(Tower tower){
+    private void changeTowerType(Tower tower){
         //We just rotate through the three tower types
         if(tower.getType().equals("ROCK")){
             tower.setType("PAPER");
