@@ -51,11 +51,15 @@ public class GameScreen implements Screen, InputProcessor {
     private int towerLevel = 1;
     private int towerLevelCost = 100;
 
+    //Counts to keep track of the towers
+    private int rockCount = 0;
+    private int paperCount = 0;
+    private int scissorsCount = 0;
+
     //Lists to keep track of towers and bullets
     private List<Tower> towerList = new ArrayList<Tower>();
     private List<Vector2> occupiedCells = new ArrayList<Vector2>();
     private List<Bullet> bulletList = new ArrayList<Bullet>();
-
 
     private int gold = 100;
     private int remainingLife = 20;
@@ -131,23 +135,6 @@ public class GameScreen implements Screen, InputProcessor {
         if (System.currentTimeMillis() - enemySpawnedTime >= 1000) {
             //If we havent reached the max number of enemies for the wave yet
             if (enemyCount != 20) {
-                //First we count the number of each type of tower the player currently has
-                int rockCount = 0;
-                int paperCount = 0;
-                int scissorsCount = 0;
-
-                for (Tower tower : towerList) {
-                    if (tower.getType().equals("ROCK")) {
-                        rockCount++;
-                    }
-                    if (tower.getType().equals("PAPER")) {
-                        paperCount++;
-                    }
-                    if (tower.getType().equals("SCISSORS")) {
-                        scissorsCount++;
-                    }
-                }
-
                 //Setting the default rate each enemy is spawned
                 double paperRate = .33;
                 double rockRate = .33;
@@ -265,12 +252,15 @@ public class GameScreen implements Screen, InputProcessor {
         switch ((int) towerToSpawn) {
             case 0:
                 tower = new Tower("ROCK", cellX, cellY);
+                rockCount++;
                 break;
             case 1:
                 tower = new Tower("PAPER", cellX, cellY);
+                paperCount++;
                 break;
             case 2:
                 tower = new Tower("SCISSORS", cellX, cellY);
+                scissorsCount++;
                 break;
         }
 
@@ -286,10 +276,16 @@ public class GameScreen implements Screen, InputProcessor {
         //We just rotate through the three tower types
         if(tower.getType().equals("ROCK")){
             tower.setType("PAPER");
+            rockCount--;
+            paperCount++;
         } else if(tower.getType().equals("PAPER")){
             tower.setType("SCISSORS");
+            paperCount--;
+            scissorsCount++;
         } else if(tower.getType().equals("SCISSORS")){
             tower.setType("ROCK");
+            rockCount--;
+            scissorsCount++;
         }
     }
 
