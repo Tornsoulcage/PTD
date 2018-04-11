@@ -1,5 +1,6 @@
 package com.ptd.csis484;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
@@ -38,9 +39,12 @@ public class Bullet {
         //Updating our movement vectors
         this.position = new Vector2(source.getPosition().x, source.getPosition().y);
 
+        //Finding where we should aim. i.e. Leading our target
         leadTarget();
 
+        //Once we have that than we can find our direction and scale it to our speed
         direction.set(interceptPosition).sub(position).nor();
+        velocity.set(direction).scl(speed);
 
         //Setting our initial bounds
         bounds = new Rectangle(position.x, position.y, 10,10);
@@ -48,21 +52,26 @@ public class Bullet {
 
     //Finds the point the tower should aim towards inorder to actually hit a target
     private void leadTarget(){
+        //These are the three parts to our quadratic equation
         float a = (target.getVelocity().x)*(target.getVelocity().x) + (target.getVelocity().y)*(target.getVelocity().y) - speed*speed;
         float b = 2 * (target.getVelocity().x) + (target.getPosition().x - source.getPosition().x) + (target.getVelocity().y + (target.getPosition().y - source.getPosition().y));
         float c = (target.getPosition().x - source.getPosition().x)*(target.getPosition().x - source.getPosition().x) + (target.getPosition().y - source.getPosition().y)*(target.getPosition().y - source.getPosition().y);
 
+        //Finding the discriminate
         float disc = b*b - 4*a*c;
+
+        //If the discriminate of our equation is less than zero than we can't hit the target
+        //They are moving faster than our bullet
         if(!(disc < 0 )){
+            //The two solutions to the equation
             float t1 = (float) ((-b + Math.sqrt(disc)) / (2*a));
             float t2 = (float) ((-b - Math.sqrt(disc)) / (2*a));
 
-            if(t1 > 0 && t1 >= t2){
+            //We want to pick the smallest non-negative solution to use
+            if(t1 > 0 && t1 <= t2){
                 interceptPosition.x = t1 * target.getVelocity().x + target.getPosition().x;
                 interceptPosition.y = t1 * target.getVelocity().y + target.getPosition().y;
-            }
-
-            if(t2 > 0 && t2 > t1){
+            } else if(t2 > 0){
                 interceptPosition.x = t2 * target.getVelocity().x + target.getPosition().x;
                 interceptPosition.y = t2 * target.getVelocity().y + target.getPosition().y;
             }
@@ -76,12 +85,8 @@ public class Bullet {
     }
 
     public void update(float delta) {
-        //Moves the bullet in the proper direction a number of times equal to it's speed
-        //Looks better than just jumping ahead that many paces and helps with actually hitting
-        //an enemy.
-        for(int i = 0; i < speed; i++) {
-            position.add(direction);
-        }
+        //Adding our velocity to our position
+        position.add(velocity);
 
         //Updating the bounds for the bullet
         bounds = new Rectangle(position.x, position.y, 10,10);

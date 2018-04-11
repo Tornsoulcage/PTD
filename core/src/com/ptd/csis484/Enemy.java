@@ -18,7 +18,6 @@ import java.util.List;
 //Class representing the three types of enemies
 public class Enemy {
     //Variables for the enemies
-    private double damage;
     private float speed;
     private double health;
     private boolean destroyed;
@@ -49,7 +48,6 @@ public class Enemy {
 
     //Default Constructor
     public Enemy() {
-        this.damage = 0;
         this.speed = 0;
         this.health = 1;
         this.destroyed = false;
@@ -63,20 +61,17 @@ public class Enemy {
         waveScale = (float)(wave * 1.01);
 
         if(type == enemyType.ROCK) {
-            this.damage = 5 * waveScale;
-            this.speed = 3 * waveScale;
+            this.speed = 1 * waveScale;
             this.health = 5* waveScale;
             this.type = type;
         }
         if(type == enemyType.SCISSORS){
-            this.damage = 1* waveScale;
-            this.speed = 5* waveScale;
+            this.speed = 3* waveScale;
             this.health = 3* waveScale;
             this.type = type;
         }
         if(type == enemyType.PAPER){
-            this.damage = 3* waveScale;
-            this.speed = 3* waveScale;
+            this.speed = 2* waveScale;
             this.health = 3* waveScale;
             this.type = type;
         }
@@ -129,13 +124,10 @@ public class Enemy {
         //Setting our movement vectors
         this.targetPosition = new Vector2(gameMap.getWaypointBounds().get(currentWaypoint).getX(), gameMap.getWaypointBounds().get(currentWaypoint).getY());
         this.direction.set(targetPosition).sub(position).nor();
-        velocity.set(direction);
+        velocity.set(direction).scl(speed);
 
-        //Moves the enemy in the direction a number of times equal to it's speed.
-        //Doing it this way helps to prevent the enemies from jumping forwards when they get faster.
-        for(int i = 0; i < speed; i++){
-            position.add(velocity);
-        }
+        //Adding our velocity to our position
+        position.add(velocity);
 
         //Updating the bounds for the enemy
         bounds = new Rectangle(position.x, position.y, 32, 32);
@@ -144,14 +136,6 @@ public class Enemy {
         if(this.bounds.overlaps(gameMap.getWaypointBounds().get(currentWaypoint))){
             currentWaypoint++;
         }
-    }
-
-    public double getDamage() {
-        return damage;
-    }
-
-    public void setDamage(double damage) {
-        this.damage = damage;
     }
 
     public float getSpeed() {
