@@ -41,6 +41,9 @@ public class GameScreen implements Screen, InputProcessor {
     private List<Enemy> enemyList = new ArrayList<Enemy>();
     private int enemyCount = 0;
 
+    //Time in milleseconds that the last enemy was spawned
+    private long enemySpawnedTime;
+
     //Keeps track of the wave number
     private int waveNumber = 1;
 
@@ -53,8 +56,6 @@ public class GameScreen implements Screen, InputProcessor {
     private List<Vector2> occupiedCells = new ArrayList<Vector2>();
     private List<Bullet> bulletList = new ArrayList<Bullet>();
 
-    private long bulletFiredTime;
-    private long enemySpawnedTime;
 
     private int gold = 100;
     private int remainingLife = 20;
@@ -109,20 +110,61 @@ public class GameScreen implements Screen, InputProcessor {
 
         //Spawns a new enemy every second
         if (System.currentTimeMillis() - enemySpawnedTime >= 1000) {
-            //Wave size is 20 enemies so we stop once we get there
+            //If we havent reached the max number of enemies for the wave yet
             if (enemyCount != 20) {
-                double enemyToSpawn = Math.random() * 3;
-                switch ((int) enemyToSpawn) {
-                    case 0:
-                        enemyList.add(new Enemy("ROCK", waveNumber, gameMap));
-                        break;
-                    case 1:
-                        enemyList.add(new Enemy("PAPER", waveNumber, gameMap));
-                        break;
-                    case 2:
-                        enemyList.add(new Enemy("SCISSORS", waveNumber, gameMap));
-                        break;
+                //First we count the number of each type of tower the player currently has
+                int rockCount = 0;
+                int paperCount = 0;
+                int scissorsCount = 0;
+
+                for (Tower tower : towerList) {
+                    if (tower.getType().equals("ROCK")) {
+                        rockCount++;
+                    }
+                    if (tower.getType().equals("PAPER")) {
+                        paperCount++;
+                    }
+                    if (tower.getType().equals("SCISSORS")) {
+                        scissorsCount++;
+                    }
                 }
+
+                //Setting the default rate each enemy is spawned
+                double paperRate = .33;
+                double rockRate = .33;
+                double scissorsRate = .33;
+
+                //If the player is favoring a certain tower we make it's opposing enemy type more
+                //likely to spawn.
+                if (rockCount > paperCount && rockCount > scissorsCount) {
+                    rockRate = .25;
+                    paperRate = .75;
+                    scissorsRate = 1;
+                }
+                if(paperCount > rockCount && paperCount > scissorsCount){
+                    rockRate = .25;
+                    paperRate = .50;
+                    scissorsRate = 1;
+                }
+                if(scissorsCount > rockCount && scissorsCount > paperCount){
+                    rockRate = .50;
+                    paperRate = .75;
+                    scissorsRate = 1;
+                }
+
+                //Rolling a random number to decide which enemy to spawn
+                double enemyToSpawn = Math.random();
+                if (enemyToSpawn <= rockRate) {
+                    enemyList.add(new Enemy("ROCK", waveNumber, gameMap));
+                }
+                if (enemyToSpawn > rockRate && enemyToSpawn <= paperRate) {
+                    enemyList.add(new Enemy("PAPER", waveNumber, gameMap));
+                }
+                if (enemyToSpawn > paperRate && enemyToSpawn <= scissorsRate) {
+                    enemyList.add(new Enemy("SCISSORS", waveNumber, gameMap));
+                }
+
+                //Incrementing our count and changing the last spawned time
                 enemyCount++;
                 enemySpawnedTime = System.currentTimeMillis();
             }
