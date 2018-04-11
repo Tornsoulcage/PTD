@@ -21,8 +21,6 @@ import com.badlogic.gdx.utils.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO Add ability to save user progress
-
 /**
  * Description: Runs the actual game
  *
@@ -100,8 +98,10 @@ public class GameScreen implements Screen, InputProcessor {
             //Spawns a new bullet every half second.
             if (System.currentTimeMillis() - tower.getBulletFiredTime() >= 500) {
                 if (!enemyList.isEmpty()) {
-                    bulletList.add(new Bullet(tower.getScaledDamage(), tower.getTarget(), tower));
-                    tower.setBulletFiredTime(System.currentTimeMillis());
+                    if(tower.getTarget().getType().equals(tower.getType())) {
+                        bulletList.add(new Bullet(tower.getScaledDamage(), tower.getTarget(), tower));
+                        tower.setBulletFiredTime(System.currentTimeMillis());
+                    }
                 }
             }
         }
@@ -113,13 +113,13 @@ public class GameScreen implements Screen, InputProcessor {
                 double enemyToSpawn = Math.random() * 3;
                 switch ((int) enemyToSpawn) {
                     case 0:
-                        enemyList.add(new Enemy(Enemy.enemyType.ROCK, waveNumber, gameMap));
+                        enemyList.add(new Enemy("ROCK", waveNumber, gameMap));
                         break;
                     case 1:
-                        enemyList.add(new Enemy(Enemy.enemyType.PAPER, waveNumber, gameMap));
+                        enemyList.add(new Enemy("PAPER", waveNumber, gameMap));
                         break;
                     case 2:
-                        enemyList.add(new Enemy(Enemy.enemyType.SCISSORS, waveNumber, gameMap));
+                        enemyList.add(new Enemy("SCISSORS", waveNumber, gameMap));
                         break;
                 }
                 enemyCount++;
@@ -203,13 +203,13 @@ public class GameScreen implements Screen, InputProcessor {
         Tower tower = new Tower();
         switch ((int) towerToSpawn) {
             case 0:
-                tower = new Tower(Tower.towerType.ROCK, cellX, cellY);
+                tower = new Tower("ROCK", cellX, cellY);
                 break;
             case 1:
-                tower = new Tower(Tower.towerType.PAPER, cellX, cellY);
+                tower = new Tower("PAPER", cellX, cellY);
                 break;
             case 2:
-                tower = new Tower(Tower.towerType.SCISSORS, cellX, cellY);
+                tower = new Tower("SCISSORS", cellX, cellY);
                 break;
         }
 
@@ -223,12 +223,12 @@ public class GameScreen implements Screen, InputProcessor {
     //Changes the type of the tower in question
     public void changeTowerType(Tower tower){
         //We just rotate through the three tower types
-        if(tower.getType() == Tower.towerType.ROCK){
-            tower.setType(Tower.towerType.PAPER);
-        } else if(tower.getType() == Tower.towerType.PAPER){
-            tower.setType(Tower.towerType.SCISSORS);
-        } else if(tower.getType() == Tower.towerType.SCISSORS){
-            tower.setType(Tower.towerType.ROCK);
+        if(tower.getType().equals("ROCK")){
+            tower.setType("PAPER");
+        } else if(tower.getType().equals("PAPER")){
+            tower.setType("SCISSORS");
+        } else if(tower.getType().equals("SCISSORS")){
+            tower.setType("ROCK");
         }
     }
 

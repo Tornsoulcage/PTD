@@ -31,11 +31,8 @@ public class Enemy {
     private Vector2 velocity = new Vector2();
     private Vector2 targetPosition = new Vector2();
 
-    //There are only three types of enemies
-    //These determine what values go into the above variables
-    public enum enemyType {ROCK, PAPER, SCISSORS}
-
-    private enemyType type;
+    //This is the type of tower this enemy is weak against
+    private String type;
 
     //Used to help determine where to place the enemy and move it around
     private float deviceHeight = Gdx.graphics.getHeight();
@@ -53,26 +50,27 @@ public class Enemy {
         this.destroyed = false;
         this.goldValue = 0;
         this.position = new Vector2(0,0);
+        this.type = "NO_ENEMY_TYPE";
     }
 
-    public Enemy(enemyType type, int wave, Map gameMap){
+    public Enemy(String type, int wave, Map gameMap){
         //Different values are passed depending on the enemy type
         //Enemies stats increase by one percent each wave
         waveScale = (float) (1 + wave * .01);
 
-        if(type == enemyType.ROCK) {
+        if(type == "ROCK") {
             this.speed = 2 * waveScale;
             this.health = 5* waveScale;
             this.type = type;
         }
-        if(type == enemyType.SCISSORS){
+        if(type == "SCISSORS"){
             this.speed = 5* waveScale;
             this.health = 3* waveScale;
             this.type = type;
         }
-        if(type == enemyType.PAPER){
+        if(type == "PAPER"){
             this.speed = 3* waveScale;
-            this.health = 3* waveScale;
+            this.health = 1* waveScale;
             this.type = type;
         }
 
@@ -91,17 +89,17 @@ public class Enemy {
 
     //Creates the enemy and places it
     public void render(ShapeRenderer renderer){
-        if(this.type == enemyType.ROCK) {
+        if(this.type == "ROCK") {
             renderer.setColor(Color.BLACK);
             renderer.set(ShapeRenderer.ShapeType.Filled);
             renderer.rect(position.x, position.y, 32, 32);
         }
-        if(this.type == enemyType.PAPER){
+        if(this.type == "PAPER"){
             renderer.setColor(Color.BLUE);
             renderer.set(ShapeRenderer.ShapeType.Filled);
             renderer.rect(position.x, position.y, 32, 32);
         }
-        if(this.type == enemyType.SCISSORS){
+        if(this.type == "SCISSORS"){
             renderer.setColor(Color.RED);
             renderer.set(ShapeRenderer.ShapeType.Filled);
             renderer.rect(position.x, position.y, 32,32);
@@ -210,11 +208,11 @@ public class Enemy {
         this.targetPosition = targetPosition;
     }
 
-    public enemyType getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(enemyType type) {
+    public void setType(String type) {
         this.type = type;
     }
 

@@ -46,10 +46,8 @@ public class Tower {
     private double targetYDist;
     private double targetDist;
 
-    //Only three types of towers are allowed
-    public enum towerType{ROCK, PAPER, SCISSORS};
-
-    private towerType type;
+    //This towers type, used to determine which enemies it can hit and it's stats
+    private String type;
 
     //Towers position on map
     private Vector2 position;
@@ -57,10 +55,11 @@ public class Tower {
     //Default Constructor
     public Tower() {
         this.position = new Vector2(0,0);
+        this.type = "NO_TOWER_TYPE";
     }
 
     //Main constructor, passes the desired type and it's location on the map
-    public Tower(towerType type, float cellX, float cellY){
+    public Tower(String type, float cellX, float cellY){
         this.type = type;
         this.timeCreated = System.currentTimeMillis();
 
@@ -83,31 +82,31 @@ public class Tower {
         this.position = new Vector2(positionX, positionY);
 
         //Depending on the tower type we change it's variables
-        if (this.type == towerType.ROCK) {
+        if (this.type == "ROCK") {
             baseDamage = 3;
         }
-        if (this.type == towerType.PAPER) {
-            baseDamage = 5;
-        }
-        if (this.type == towerType.SCISSORS) {
+        if (this.type == "PAPER") {
             baseDamage = 1;
+        }
+        if (this.type == "SCISSORS") {
+            baseDamage = 2;
         }
     }
 
     //Just draws a red rectangle to represent the tower
     public void render(ShapeRenderer renderer){
-        if(type == towerType.ROCK){
-            renderer.setColor(Color.RED);
-            renderer.set(ShapeRenderer.ShapeType.Filled);
-            renderer.rect(position.x, position.y, 20,20);
-        }
-        if(type == towerType.PAPER){
+        if(type == "ROCK"){
             renderer.setColor(Color.BLACK);
             renderer.set(ShapeRenderer.ShapeType.Filled);
             renderer.rect(position.x, position.y, 20,20);
         }
-        if(type == towerType.SCISSORS){
+        if(type == "PAPER"){
             renderer.setColor(Color.BLUE);
+            renderer.set(ShapeRenderer.ShapeType.Filled);
+            renderer.rect(position.x, position.y, 20,20);
+        }
+        if(type == "SCISSORS"){
+            renderer.setColor(Color.RED);
             renderer.set(ShapeRenderer.ShapeType.Filled);
             renderer.rect(position.x, position.y, 20,20);
         }
@@ -128,19 +127,21 @@ public class Tower {
                     this.target = new Enemy();
                 }
 
-                //Gets the current distance to the target
-                targetXDist = Math.abs((position.x - target.getPosition().x));
-                targetYDist = Math.abs((position.y - target.getPosition().y));
-                targetDist = Math.sqrt((targetXDist * targetXDist + targetYDist * targetYDist));
+                if(enemy.getType().equals(this.type)) {
+                    //Gets the current distance to the target
+                    targetXDist = Math.abs((position.x - target.getPosition().x));
+                    targetYDist = Math.abs((position.y - target.getPosition().y));
+                    targetDist = Math.sqrt((targetXDist * targetXDist + targetYDist * targetYDist));
 
-                //Gets the distance to the potential target
-                targetXDist = Math.abs((position.x - enemy.getPosition().x));
-                targetYDist = Math.abs((position.y - enemy.getPosition().y));
-                newTargetDist = Math.sqrt((targetXDist * targetXDist + targetYDist * targetYDist));
+                    //Gets the distance to the potential target
+                    targetXDist = Math.abs((position.x - enemy.getPosition().x));
+                    targetYDist = Math.abs((position.y - enemy.getPosition().y));
+                    newTargetDist = Math.sqrt((targetXDist * targetXDist + targetYDist * targetYDist));
 
-                //If potential is less than actual we change targets
-                if (newTargetDist < targetDist) {
-                    target = enemy;
+                    //If potential is less than actual we change targets
+                    if (newTargetDist < targetDist) {
+                        target = enemy;
+                    }
                 }
             }
         } else {
@@ -228,11 +229,11 @@ public class Tower {
         this.targetDist = targetDist;
     }
 
-    public towerType getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(towerType type) {
+    public void setType(String type) {
         this.type = type;
     }
 

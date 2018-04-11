@@ -19,12 +19,11 @@ public class Bullet {
     private int speed;
 
     //Vectors to handle bullet motion
-    //Unused vectors are staying in case we change the way we handle movement
     private Vector2 position = new Vector2();
     private Vector2 direction = new Vector2();
     private Vector2 velocity = new Vector2();
-    private Vector2 movement = new Vector2();
 
+    //The bounds of this bullet
     private Rectangle bounds;
 
     public Bullet(int dam, Enemy target, Tower source){
@@ -35,11 +34,13 @@ public class Bullet {
         //How many pixels the bullet passes each frame
         this.speed = 20;
 
-        //Updating our movement vectors
+        //Setting our movement vectors
         this.position = new Vector2(source.getPosition().x, source.getPosition().y);
+        this.direction.set(target.getPosition()).sub(this.position);
+        this.velocity.set(direction).scl(speed);
 
         //Setting our initial bounds
-        bounds = new Rectangle(position.x, position.y, 10,10);
+        this.bounds = new Rectangle(position.x, position.y, 10,10);
     }
 
     public void render(ShapeRenderer renderer){
@@ -120,14 +121,6 @@ public class Bullet {
 
     public void setVelocity(Vector2 velocity) {
         this.velocity = velocity;
-    }
-
-    public Vector2 getMovement() {
-        return movement;
-    }
-
-    public void setMovement(Vector2 movement) {
-        this.movement = movement;
     }
 
     public Rectangle getBounds() {
