@@ -22,7 +22,7 @@ public class Bullet {
     private Vector2 position = new Vector2();
     private Vector2 direction = new Vector2();
     private Vector2 velocity = new Vector2();
-    private Vector2 targetPosition = new Vector2();
+    private Vector2 interceptPosition = new Vector2();
     private Vector2 movement = new Vector2();
 
     private Rectangle bounds;
@@ -37,11 +37,36 @@ public class Bullet {
 
         //Updating our movement vectors
         this.position = new Vector2(source.getPosition().x, source.getPosition().y);
-        this.targetPosition = new Vector2(target.getPosition().x, target.getPosition().y);
-        direction.set(targetPosition).sub(position).nor();
+
+        leadTarget();
+
+        direction.set(interceptPosition).sub(position).nor();
 
         //Setting our initial bounds
         bounds = new Rectangle(position.x, position.y, 10,10);
+    }
+
+    //Finds the point the tower should aim towards inorder to actually hit a target
+    private void leadTarget(){
+        float a = (target.getVelocity().x)*(target.getVelocity().x) + (target.getVelocity().y)*(target.getVelocity().y) - speed*speed;
+        float b = 2 * (target.getVelocity().x) + (target.getPosition().x - source.getPosition().x) + (target.getVelocity().y + (target.getPosition().y - source.getPosition().y));
+        float c = (target.getPosition().x - source.getPosition().x)*(target.getPosition().x - source.getPosition().x) + (target.getPosition().y - source.getPosition().y)*(target.getPosition().y - source.getPosition().y);
+
+        float disc = b*b - 4*a*c;
+        if(!(disc < 0 )){
+            float t1 = (float) ((-b + Math.sqrt(disc)) / (2*a));
+            float t2 = (float) ((-b - Math.sqrt(disc)) / (2*a));
+
+            if(t1 > 0 && t1 >= t2){
+                interceptPosition.x = t1 * target.getVelocity().x + target.getPosition().x;
+                interceptPosition.y = t1 * target.getVelocity().y + target.getPosition().y;
+            }
+
+            if(t2 > 0 && t2 > t1){
+                interceptPosition.x = t2 * target.getVelocity().x + target.getPosition().x;
+                interceptPosition.y = t2 * target.getVelocity().y + target.getPosition().y;
+            }
+        }
     }
 
     public void render(ShapeRenderer renderer){
@@ -116,14 +141,6 @@ public class Bullet {
 
     public void setVelocity(Vector2 velocity) {
         this.velocity = velocity;
-    }
-
-    public Vector2 getTargetPosition() {
-        return targetPosition;
-    }
-
-    public void setTargetPosition(Vector2 targetPosition) {
-        this.targetPosition = targetPosition;
     }
 
     public Vector2 getMovement() {
