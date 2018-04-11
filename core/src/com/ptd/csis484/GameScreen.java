@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -99,7 +100,7 @@ public class GameScreen implements Screen, InputProcessor {
             if (System.currentTimeMillis() - tower.getBulletFiredTime() >= 500) {
                 if (!enemyList.isEmpty()) {
                     if(tower.getTarget().getType().equals(tower.getType())) {
-                        bulletList.add(new Bullet(tower.getScaledDamage(), tower.getTarget(), tower));
+                        bulletList.add(new Bullet(tower.getTarget(), tower));
                         tower.setBulletFiredTime(System.currentTimeMillis());
                     }
                 }
@@ -297,7 +298,7 @@ public class GameScreen implements Screen, InputProcessor {
         }
 
         //If it is a tower tile we check other traits
-        if((gameMap.getMapArray()[(int)(9 - cellY)][(int)cellX]) == 't'){
+        if((gameMap.getMapArray()[(int)(gameMap.getTILE_Y_COUNT() - 1 - cellY)][(int)cellX]) == 't'){
             //Shows whether or not the cell in question is already occupied
             boolean occupiedCell = false;
 

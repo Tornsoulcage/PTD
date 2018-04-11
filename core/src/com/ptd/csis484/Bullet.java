@@ -26,7 +26,7 @@ public class Bullet {
     //The bounds of this bullet
     private Rectangle bounds;
 
-    public Bullet(int dam, Enemy target, Tower source){
+    public Bullet(Enemy target, Tower source){
         this.source = source;
         this.damage = source.getScaledDamage();
         this.target = target;

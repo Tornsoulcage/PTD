@@ -56,7 +56,7 @@ public class Enemy {
     public Enemy(String type, int wave, Map gameMap){
         //Different values are passed depending on the enemy type
         //Enemies stats increase by one percent each wave
-        waveScale = (float) (1 + wave * .01);
+        waveScale = (float) (1 + wave * .05);
 
         if(type == "ROCK") {
             this.speed = 2 * waveScale;
