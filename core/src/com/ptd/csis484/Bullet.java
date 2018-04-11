@@ -23,7 +23,6 @@ public class Bullet {
     private Vector2 position = new Vector2();
     private Vector2 direction = new Vector2();
     private Vector2 velocity = new Vector2();
-    private Vector2 interceptPosition = new Vector2();
     private Vector2 movement = new Vector2();
 
     private Rectangle bounds;
@@ -39,43 +38,8 @@ public class Bullet {
         //Updating our movement vectors
         this.position = new Vector2(source.getPosition().x, source.getPosition().y);
 
-        //Finding where we should aim. i.e. Leading our target
-        leadTarget();
-
-        //Once we have that than we can find our direction and scale it to our speed
-        direction.set(interceptPosition).sub(position).nor();
-        velocity.set(direction).scl(speed);
-
         //Setting our initial bounds
         bounds = new Rectangle(position.x, position.y, 10,10);
-    }
-
-    //Finds the point the tower should aim towards inorder to actually hit a target
-    private void leadTarget(){
-        //These are the three parts to our quadratic equation
-        float a = (target.getVelocity().x)*(target.getVelocity().x) + (target.getVelocity().y)*(target.getVelocity().y) - speed*speed;
-        float b = 2 * (target.getVelocity().x) + (target.getPosition().x - source.getPosition().x) + (target.getVelocity().y + (target.getPosition().y - source.getPosition().y));
-        float c = (target.getPosition().x - source.getPosition().x)*(target.getPosition().x - source.getPosition().x) + (target.getPosition().y - source.getPosition().y)*(target.getPosition().y - source.getPosition().y);
-
-        //Finding the discriminate
-        float disc = b*b - 4*a*c;
-
-        //If the discriminate of our equation is less than zero than we can't hit the target
-        //They are moving faster than our bullet
-        if(!(disc < 0 )){
-            //The two solutions to the equation
-            float t1 = (float) ((-b + Math.sqrt(disc)) / (2*a));
-            float t2 = (float) ((-b - Math.sqrt(disc)) / (2*a));
-
-            //We want to pick the smallest non-negative solution to use
-            if(t1 > 0 && t1 <= t2){
-                interceptPosition.x = t1 * target.getVelocity().x + target.getPosition().x;
-                interceptPosition.y = t1 * target.getVelocity().y + target.getPosition().y;
-            } else if(t2 > 0){
-                interceptPosition.x = t2 * target.getVelocity().x + target.getPosition().x;
-                interceptPosition.y = t2 * target.getVelocity().y + target.getPosition().y;
-            }
-        }
     }
 
     public void render(ShapeRenderer renderer){
@@ -84,7 +48,17 @@ public class Bullet {
         renderer.circle(position.x, position.y, 5);
     }
 
+    //Moves our bullet towards the enemy
+    //Bullets are homing so they constantly adjust direction to ensure they hit the target
     public void update(float delta) {
+        //If our target was destroyed we just continue going in the last known direction until the
+        //bullet exits the map
+        if(!target.isDestroyed()){
+            //Finding the current direction to the target and scaling our movement vector to our speed
+            direction.set(target.getPosition()).sub(position).nor();
+            velocity.set(direction).scl(speed);
+        }
+
         //Adding our velocity to our position
         position.add(velocity);
 
