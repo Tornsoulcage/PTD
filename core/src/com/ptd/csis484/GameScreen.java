@@ -32,7 +32,7 @@ public class GameScreen implements Screen, InputProcessor {
     private int enemyCount = 0;
 
     //Time in milliseconds that the last enemy was spawned
-    private long enemySpawnedTime;
+    private long enemySpawnedTime = 0;
 
     //Keeps track of the wave number
     private int waveNumber = 1;
@@ -84,8 +84,8 @@ public class GameScreen implements Screen, InputProcessor {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
         //These functions spawn and update the necessary elements for the game
-        updateTowers();
         spawnEnemy();
+        updateTowers();
         updateEnemies();
         updateBullets();
 
@@ -121,13 +121,13 @@ public class GameScreen implements Screen, InputProcessor {
     //Function to spawn a new enemy
     private void spawnEnemy(){
         //Spawns a new enemy every second
-        if (System.currentTimeMillis() - enemySpawnedTime >= 350) {
-            //If we havent reached the max number of enemies for the wave yet
+        if (System.currentTimeMillis() - enemySpawnedTime >= 750) {
+            //If we haven't reached the max number of enemies for the wave yet
             if (enemyCount != 20) {
                 //Setting the default rate each enemy is spawned
-                double paperRate = .33;
                 double rockRate = .33;
-                double scissorsRate = .33;
+                double paperRate = .66;
+                double scissorsRate = 1;
 
                 //If the player is favoring a certain tower we make it's opposing enemy type more
                 //likely to spawn.
@@ -135,13 +135,11 @@ public class GameScreen implements Screen, InputProcessor {
                     rockRate = .25;
                     paperRate = .75;
                     scissorsRate = 1;
-                }
-                if(paperCount > rockCount && paperCount > scissorsCount){
+                } else if(paperCount > rockCount && paperCount > scissorsCount){
                     rockRate = .25;
                     paperRate = .50;
                     scissorsRate = 1;
-                }
-                if(scissorsCount > rockCount && scissorsCount > paperCount){
+                } else if(scissorsCount > rockCount && scissorsCount > paperCount){
                     rockRate = .50;
                     paperRate = .75;
                     scissorsRate = 1;
@@ -151,17 +149,25 @@ public class GameScreen implements Screen, InputProcessor {
                 double enemyToSpawn = Math.random();
                 if (enemyToSpawn <= rockRate) {
                     enemyList.add(new Enemy("ROCK", waveNumber, gameMap));
+
+                    //Incrementing our count and changing the last spawned time
+                    enemyCount++;
+                    enemySpawnedTime = System.currentTimeMillis();
                 }
                 if (enemyToSpawn > rockRate && enemyToSpawn <= paperRate) {
                     enemyList.add(new Enemy("PAPER", waveNumber, gameMap));
+
+                    //Incrementing our count and changing the last spawned time
+                    enemyCount++;
+                    enemySpawnedTime = System.currentTimeMillis();
                 }
                 if (enemyToSpawn > paperRate && enemyToSpawn <= scissorsRate) {
                     enemyList.add(new Enemy("SCISSORS", waveNumber, gameMap));
-                }
 
-                //Incrementing our count and changing the last spawned time
-                enemyCount++;
-                enemySpawnedTime = System.currentTimeMillis();
+                    //Incrementing our count and changing the last spawned time
+                    enemyCount++;
+                    enemySpawnedTime = System.currentTimeMillis();
+                }
             }
         }
     }

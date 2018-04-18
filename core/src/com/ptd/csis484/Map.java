@@ -342,6 +342,10 @@ public class Map {
 
         //After the waypoints are sorted we add in the final waypoint, the exit one.
         waypointBounds.add(new Rectangle(waypointEnd.x, waypointEnd.y, tileWidth / 3, tileHeight / 3));
+
+        if(waypointBounds.size() < 3){
+            createMap();
+        }
     }
 
     //Getters and Setters for our variables
