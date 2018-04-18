@@ -40,7 +40,6 @@ public class Map {
 
     //Bounds for map objects
     private Rectangle gameBounds = new Rectangle(0,0, deviceWidth, deviceHeight);
-    private Rectangle levelButton = new Rectangle(3*tileWidth, 8*tileHeight, 2*tileWidth, 2*tileHeight);
 
     //Used to keep track of the map and where enemies should go
     private char mapArray[][] = new char[TILE_Y_COUNT][];
@@ -442,14 +441,6 @@ public class Map {
 
     public void setGameBounds(Rectangle gameBounds) {
         this.gameBounds = gameBounds;
-    }
-
-    public Rectangle getLevelButton() {
-        return levelButton;
-    }
-
-    public void setLevelButton(Rectangle levelButton) {
-        this.levelButton = levelButton;
     }
 
     public char[][] getMapArray() {

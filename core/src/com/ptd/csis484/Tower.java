@@ -32,11 +32,8 @@ public class Tower {
     private int upgradeCost;
     private int switchCost;
 
-    private int towerLevel;
     private long timeCreated;
     private long bulletFiredTime;
-
-    private int waveTowerLevel = 1;
 
     //Sets a default enemy to be the target
     private Enemy target = new Enemy();
@@ -114,8 +111,6 @@ public class Tower {
 
     //Updates the tower to get a new target
     public void update(List<Enemy> enemyList) {
-        //Updating our damage to the current waveTowerLevel value
-        this.scaledDamage = this.baseDamage * waveTowerLevel;
         //Variable to hold temp distance for each enemy
         double newTargetDist;
         //Only runs if there is a enemy
@@ -285,28 +280,12 @@ public class Tower {
         this.switchCost = switchCost;
     }
 
-    public int getTowerLevel() {
-        return towerLevel;
-    }
-
-    public void setTowerLevel(int towerLevel) {
-        this.towerLevel = towerLevel;
-    }
-
     public long getTimeCreated() {
         return timeCreated;
     }
 
     public void setTimeCreated(long timeCreated) {
         this.timeCreated = timeCreated;
-    }
-
-    public int getWaveTowerLevel() {
-        return waveTowerLevel;
-    }
-
-    public void setWaveTowerLevel(int waveTowerLevel) {
-        this.waveTowerLevel = waveTowerLevel;
     }
 
     public long getBulletFiredTime() {

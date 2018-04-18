@@ -47,10 +47,6 @@ public class GameScreen implements Screen, InputProcessor {
     //Keeps track of the wave number
     private int waveNumber = 1;
 
-    //Scaling for the towers in the current wave
-    private int towerLevel = 1;
-    private int towerLevelCost = 100;
-
     //Counts to keep track of the towers
     private int rockCount = 0;
     private int paperCount = 0;
@@ -92,10 +88,6 @@ public class GameScreen implements Screen, InputProcessor {
         //Starting the shape renderer
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
-        shapeRenderer.setColor(Color.BLACK);
-        shapeRenderer.set(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.rect(gameMap.getLevelButton().getX(), gameMap.getLevelButton().getY(), gameMap.getLevelButton().getWidth(), gameMap.getLevelButton().getHeight());
-
         //These functions spawn and update the necessary elements for the game
         updateTowers();
         spawnEnemy();
@@ -115,8 +107,6 @@ public class GameScreen implements Screen, InputProcessor {
         String goldString = "Gold = " + gold;
         String waveString = "Wave = " + waveNumber;
         String lifeString = "Life = " + remainingLife;
-        String levelString = "Lvl = " + towerLevel;
-        String costString = "Cost = " + towerLevelCost;
 
         //Displaying the strings in the top left corner of the screen for the user
         game.batch.setProjectionMatrix(camera.combined);
@@ -124,8 +114,6 @@ public class GameScreen implements Screen, InputProcessor {
         game.font.draw(game.batch, goldString, 0, gameMap.getViewportHeight());
         game.font.draw(game.batch, waveString, 0, gameMap.getViewportHeight() - (gameMap.getTILE_SIDE_LENGTH() - game.font.getXHeight()));
         game.font.draw(game.batch, lifeString, 0, gameMap.getViewportHeight() - 2*(gameMap.getTILE_SIDE_LENGTH() - game.font.getXHeight()));
-        game.font.draw(game.batch, levelString, 3*gameMap.getTILE_SIDE_LENGTH(), gameMap.getViewportHeight() - gameMap.getTILE_SIDE_LENGTH() + 2*game.font.getXHeight());
-        game.font.draw(game.batch, costString, 3*gameMap.getTILE_SIDE_LENGTH(), gameMap.getViewportHeight() - gameMap.getTILE_SIDE_LENGTH() - game.font.getXHeight());
         game.batch.end();
     }
 
@@ -338,20 +326,6 @@ public class GameScreen implements Screen, InputProcessor {
         float cellY = screenY/gameMap.getTileHeight();
         cellX = MathUtils.floor(cellX);
         cellY = MathUtils.floor(cellY);
-
-        //Checking if the user taps the level up squares
-        Rectangle touch = new Rectangle(screenX, gameMap.getDeviceHeight() - screenY, 1, 1);
-        if(touch.overlaps(gameMap.getLevelButton())){
-            if(gold >= towerLevelCost) {
-                towerLevel++;
-                gold -= towerLevelCost;
-                towerLevelCost = (int) Math.floor(towerLevelCost * 1.05);
-            }
-
-            for(Tower tower : towerList){
-                tower.setWaveTowerLevel(towerLevel);
-            }
-        }
 
         //If it is a tower tile we check other traits
         if((gameMap.getMapArray()[(int)(gameMap.getTILE_Y_COUNT() - 1 - cellY)][(int)cellX]) == 't'){
