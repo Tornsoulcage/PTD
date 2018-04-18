@@ -2,14 +2,12 @@ package com.ptd.csis484;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -24,9 +22,8 @@ public class Map {
     private final int TILE_Y_COUNT = 10;
     private final int TILE_SIDE_LENGTH = 32;
 
+    //Helps to make sure all of our assets load in properly
     private AssetManager manager = new AssetManager();
-
-    private OrthographicCamera camera;
 
     //Size of the map
     private int viewportWidth = TILE_X_COUNT * TILE_SIDE_LENGTH;
@@ -47,23 +44,22 @@ public class Map {
     private Vector2 waypointStart = new Vector2();
     private Vector2 waypointEnd = new Vector2();
 
-
-
+    //Class to hold all of teh information for the map
     public Map(){
+        //Creates the map array
         createMap();
-
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, this.getViewportWidth(), this.getViewportHeight());
-        camera.update();
     }
 
+    //Renders the map to the screen
     public void render(final PTD game){
         //Loading the assets to display the map
         manager.load("Tiles/grass0-dirt-mix1.png", Texture.class);
         manager.load("Tiles/grass_flowers_blue1.png", Texture.class);
         manager.load("Tiles/grass_full.png", Texture.class);
 
+        //We have to wait until all of the assets are fully loaded before continuing
         manager.finishLoading();
+
         //Looping through the array and setting a cell with the appropriate texture
         for (int y = mapArray.length-1; y >= 0; y--) {
             for (int x = 0; x < mapArray[y].length; x++) {
@@ -88,7 +84,7 @@ public class Map {
 
     //Creates the array to represent each tile and it's attributes
     private void createMap(){
-        //First we finish creating the array
+        //First we create the second dimension of the array
         for(int i = 0; i < mapArray.length; i++){
             mapArray[i] = new char[TILE_X_COUNT];
         }
@@ -99,6 +95,7 @@ public class Map {
         mapArray[start][0] = 's';
 
         //Setting our current position the distance variable
+        //CurrentY/X are in terms of tiles, not pixels
         int currentY = start;
         int currentX = 0;
         int distance;
@@ -112,19 +109,23 @@ public class Map {
         boolean firstRoll = true;
 
         do {
-            //Our map length is 15 tiles. We also need a minimum of two tiles for every path,
+            //We need a minimum of two tiles for the lengh of the path
             //Which prevents paths from being next to each, there will always be a space between them.
             if(firstRoll){
                 //The first distance has to go beyond the user info so push it to be above 3
+                //An example to explain: TILE_X_COUNT = 15 means our array is from 0-14
+                //If we want to push the start to be start at the fourth tile in we change our range
+                //to 4-18, so we subtract 4 from our random function to get 4-14.
                 distance = (int) (Math.random() * (TILE_X_COUNT - 4));
                 distance += 3;
                 firstRoll = false;
             } else {
                 //Otherwise we roll a minimum of two up to the tile limit
-                distance = (int) (Math.random() * ((TILE_X_COUNT - 2) - currentX) + 2);
+                distance = (int) (Math.random() * ((TILE_X_COUNT - 2) - currentX));
+                distance += 2;
             }
 
-            //First we loop through the x axis until we place a number of spots equal to the distance
+            //Then we loop through the x axis until we place a number of spots equal to the distance
             for(int i = 1; i <= distance; i++){
                 //If we reach the end of the axis we want to place the end tile and end the loop
                 if(currentX + i == TILE_X_COUNT - 1){
@@ -139,12 +140,14 @@ public class Map {
             //Then we add that distance to our x to shift our position to where we ended
             currentX += (distance);
 
-            //If we reach the end tile we don't want to go up or down
+            //If we reach the end tile we don't want move on the y-axis
             if(!finished) {
-                //We roll a random number to decide wether we will go up or down
+                //We roll a random number to decide whether we will go up or down
                 double direction = Math.random();
 
                 //These prevent us from picking down or up when we on the boundary of the map
+                //The number is arbitrary, just needs to be within the range for the direction
+                //we want to go.
                 if(currentY == 0){
                     direction = .2;
                 }
@@ -154,7 +157,6 @@ public class Map {
 
                 //Less than .5 is down
                 if (direction < .5) {
-                    //Same as the xaxis but with a smaller length for the y axis
                     distance = (int) (Math.random() * (TILE_Y_COUNT - currentY));
 
                     //Looping through the y axis to place a number of tiles equal to our distance
@@ -176,7 +178,7 @@ public class Map {
                         mapArray[currentY - i][currentX] = 'p';
                     }
 
-                    //Then we substract our distance to shift us to our new position
+                    //Then we subtract our distance to shift us to our new position
                     currentY -= distance;
                 }
             }
@@ -290,8 +292,8 @@ public class Map {
 
                 //If our index is an e then that's our end tile
                 //We add one to the x index to push the waypoint outside the game bounds, then
-                //Then enemy will be removed while progressing towards that waypoint
-                //We also a waypoint at the actual end tile to line the enemy up with the exit
+                //the enemy will be removed while progressing towards that waypoint
+                //We also add waypoint at the actual end tile to line the enemy up with the exit
                 if(mapArray[y][x] == 'e'){
                     waypointEnd.x = tileWidth * (x+1) + tileWidth / 3;
                     waypointEnd.y = tileHeight * y + tileHeight / 3;
@@ -343,32 +345,12 @@ public class Map {
     }
 
     //Getters and Setters for our variables
-    public OrthographicCamera getCamera() {
-        return camera;
-    }
-
-    public void setCamera(OrthographicCamera camera) {
-        this.camera = camera;
-    }
-
     public Vector2 getWaypointStart() {
         return waypointStart;
     }
 
-    public void setWaypointStart(Vector2 waypointStart) {
-        this.waypointStart = waypointStart;
-    }
-
     public List<Rectangle> getWaypointBounds() {
         return waypointBounds;
-    }
-
-    public void setWaypointBounds(List<Rectangle> waypointBounds) {
-        this.waypointBounds = waypointBounds;
-    }
-
-    public int getTILE_X_COUNT() {
-        return TILE_X_COUNT;
     }
 
     public int getTILE_Y_COUNT() {
@@ -379,75 +361,33 @@ public class Map {
         return TILE_SIDE_LENGTH;
     }
 
-    public AssetManager getManager() {
-        return manager;
-    }
-
-    public void setManager(AssetManager manager) {
-        this.manager = manager;
-    }
-
     public int getViewportWidth() {
         return viewportWidth;
-    }
-
-    public void setViewportWidth(int viewportWidth) {
-        this.viewportWidth = viewportWidth;
     }
 
     public int getViewportHeight() {
         return viewportHeight;
     }
 
-    public void setViewportHeight(int viewportHeight) {
-        this.viewportHeight = viewportHeight;
-    }
-
     public float getDeviceHeight() {
         return deviceHeight;
     }
 
-    public void setDeviceHeight(float deviceHeight) {
-        this.deviceHeight = deviceHeight;
-    }
-
-    public float getDeviceWidth() {
-        return deviceWidth;
-    }
-
-    public void setDeviceWidth(float deviceWidth) {
-        this.deviceWidth = deviceWidth;
-    }
+    public float getDeviceWidth(){return deviceWidth; }
 
     public float getTileHeight() {
         return tileHeight;
-    }
-
-    public void setTileHeight(float tileHeight) {
-        this.tileHeight = tileHeight;
     }
 
     public float getTileWidth() {
         return tileWidth;
     }
 
-    public void setTileWidth(float tileWidth) {
-        this.tileWidth = tileWidth;
-    }
-
     public Rectangle getGameBounds() {
         return gameBounds;
     }
 
-    public void setGameBounds(Rectangle gameBounds) {
-        this.gameBounds = gameBounds;
-    }
-
     public char[][] getMapArray() {
         return mapArray;
-    }
-
-    public void setMapArray(char[][] mapArray) {
-        this.mapArray = mapArray;
     }
 }

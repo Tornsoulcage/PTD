@@ -3,21 +3,11 @@ package com.ptd.csis484;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.input.GestureDetector;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +31,7 @@ public class GameScreen implements Screen, InputProcessor {
     private List<Enemy> enemyList = new ArrayList<Enemy>();
     private int enemyCount = 0;
 
-    //Time in milleseconds that the last enemy was spawned
+    //Time in milliseconds that the last enemy was spawned
     private long enemySpawnedTime;
 
     //Keeps track of the wave number
@@ -58,9 +48,11 @@ public class GameScreen implements Screen, InputProcessor {
     private List<Bullet> bulletList = new ArrayList<Bullet>();
     private boolean occupiedCell;
 
+    //Stats to keep track of the player's information
     private int gold = 100;
     private int remainingLife = 20;
 
+    //Used to track whether or not the user is doing a long press
     private long touchTime;
 
     //Creating the Screen and rendering a test map
@@ -238,6 +230,7 @@ public class GameScreen implements Screen, InputProcessor {
 
     //Spawns a tower on the requested tile
     private void spawnTower(float cellX, float cellY){
+        //Pick a random number to pick which type of tower to spawn
         double towerToSpawn = Math.random() * 3;
         Tower tower = new Tower();
         switch ((int) towerToSpawn) {
@@ -255,6 +248,7 @@ public class GameScreen implements Screen, InputProcessor {
                 break;
         }
 
+        //If the user has enough gold we can spawn a new tower
         if(gold >= tower.getGoldCost()){
             gold -= tower.getGoldCost();
             towerList.add(tower);
@@ -362,24 +356,29 @@ public class GameScreen implements Screen, InputProcessor {
         cellX = MathUtils.floor(cellX);
         cellY = MathUtils.floor(cellY);
 
+        //If the cell is occupied we can either level up or change the tower type
         if (occupiedCell) {
+            //500 milliseconds is the amount for a long press
             if (System.currentTimeMillis() - touchTime > 500) {
                 //If the cell is occupied we change the tower type
                 for (Tower tower : towerList) {
                     if (tower.getCellX() == cellX && tower.getCellY() == cellY) {
                         if (tower.getTowerLevel() < 5) {
+                            //If the user has enough gold to level up the tower than we do so
+                            //and scale the attributes for leveling
                             if (gold >= tower.getTowerLevelCost()) {
                                 gold -= tower.getTowerLevelCost();
                                 tower.setTowerLevelCost(tower.getTowerLevelCost() * 1.05);
                                 tower.setTowerLevel(tower.getTowerLevel() + 1);
                             }
                         }
+                        //If we find the right tower then we quit looping through the list
                         break;
                     }
                 }
             } else {
-                //If the cell is occupied we change the tower type
                 for (Tower tower : towerList) {
+                    //If this tower is in the same cell as we want
                     if (tower.getCellX() == cellX && tower.getCellY() == cellY) {
                         //If it's within 5 seconds of a tower change or creation the change is free
                         if ((System.currentTimeMillis() - tower.getTimeCreated()) < 5000) {
@@ -390,12 +389,12 @@ public class GameScreen implements Screen, InputProcessor {
                             gold -= tower.getSwitchCost();
                             tower.setTimeCreated(System.currentTimeMillis());
                         }
+                        //If we find the right tower then we finish looping through the list
                         break;
                     }
                 }
             }
         }
-
         return false;
     }
 

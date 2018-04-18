@@ -1,6 +1,5 @@
 package com.ptd.csis484;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
@@ -13,10 +12,13 @@ import com.badlogic.gdx.math.Vector2;
  */
 
 public class Bullet {
-    private double damage;
+    //Objects to help calculate direction
     private Enemy target;
     private Tower source;
+
+    //Variables for bullet stats
     private int speed;
+    private double damage;
 
     //Vectors to handle bullet motion
     private Vector2 position = new Vector2();
@@ -27,9 +29,11 @@ public class Bullet {
     private Rectangle bounds;
 
     public Bullet(Enemy target, Tower source){
+        //Setting the objects
         this.source = source;
-        this.damage = source.getScaledDamage();
         this.target = target;
+
+        this.damage = source.getScaledDamage();
 
         //How many pixels the bullet passes each frame
         this.speed = 20;
@@ -71,63 +75,7 @@ public class Bullet {
         return damage;
     }
 
-    public void setDamage(double damage) {
-        this.damage = damage;
-    }
-
-    public Enemy getTarget() {
-        return target;
-    }
-
-    public void setTarget(Enemy target) {
-        this.target = target;
-    }
-
-    public Tower getSource() {
-        return source;
-    }
-
-    public void setSource(Tower source) {
-        this.source = source;
-    }
-
-    public int getSpeed() {
-        return speed;
-    }
-
-    public void setSpeed(int speed) {
-        this.speed = speed;
-    }
-
-    public Vector2 getPosition() {
-        return position;
-    }
-
-    public void setPosition(Vector2 position) {
-        this.position = position;
-    }
-
-    public Vector2 getDirection() {
-        return direction;
-    }
-
-    public void setDirection(Vector2 direction) {
-        this.direction = direction;
-    }
-
-    public Vector2 getVelocity() {
-        return velocity;
-    }
-
-    public void setVelocity(Vector2 velocity) {
-        this.velocity = velocity;
-    }
-
     public Rectangle getBounds() {
         return bounds;
-    }
-
-    public void setBounds(Rectangle bounds) {
-        this.bounds = bounds;
     }
 }

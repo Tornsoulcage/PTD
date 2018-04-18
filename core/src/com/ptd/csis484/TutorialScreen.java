@@ -28,7 +28,6 @@ public class TutorialScreen implements Screen, InputProcessor {
     private float deviceHeight = Gdx.graphics.getHeight();
     private float deviceWidth = Gdx.graphics.getWidth();
 
-    private ShapeRenderer shapeRenderer;
     private GlyphLayout glyphLayout;
 
     private float scaleHPercent = viewportHeight/deviceHeight;
@@ -54,32 +53,33 @@ public class TutorialScreen implements Screen, InputProcessor {
         //tile shapes
         glyphLayout.setText(game.font, "SCISSORS Enemy");
 
-        shapeRenderer = new ShapeRenderer();
+        ShapeRenderer shapeRenderer = new ShapeRenderer();
+
         camera.update();
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
         //Drawing the various squares to represent the enemies and towers we use
         shapeRenderer.setColor(Color.RED);
-        shapeRenderer.rect(45/scaleWPercent, (viewportHeight - 14*game.font.getLineHeight() + 9)/scaleHPercent, 30,30);
+        shapeRenderer.rect(45/scaleWPercent, (viewportHeight - 16*game.font.getLineHeight() + 9)/scaleHPercent, 30,30);
 
         shapeRenderer.setColor(Color.BLUE);
-        shapeRenderer.rect(45/scaleWPercent,  (viewportHeight - 13*game.font.getLineHeight() + 9)/scaleHPercent, 30,30);
+        shapeRenderer.rect(45/scaleWPercent,  (viewportHeight - 15*game.font.getLineHeight() + 9)/scaleHPercent, 30,30);
 
         shapeRenderer.setColor(Color.BLACK);
-        shapeRenderer.rect(45/scaleWPercent, (viewportHeight - 12*game.font.getLineHeight() + 9)/scaleHPercent, 30,30);
+        shapeRenderer.rect(45/scaleWPercent, (viewportHeight - 14*game.font.getLineHeight() + 9)/scaleHPercent, 30,30);
 
         shapeRenderer.setColor(Color.BROWN);
-        shapeRenderer.rect((105 + glyphLayout.width)/scaleWPercent, (viewportHeight - 12*game.font.getLineHeight() + 9)/scaleHPercent, 30,30);
-
-        shapeRenderer.setColor(Color.LIME);
-        shapeRenderer.rect((105 + glyphLayout.width)/scaleWPercent,  (viewportHeight - 13*game.font.getLineHeight() + 9)/scaleHPercent, 30,30);
-
-        shapeRenderer.setColor(Color.FOREST);
         shapeRenderer.rect((105 + glyphLayout.width)/scaleWPercent, (viewportHeight - 14*game.font.getLineHeight() + 9)/scaleHPercent, 30,30);
 
+        shapeRenderer.setColor(Color.LIME);
+        shapeRenderer.rect((105 + glyphLayout.width)/scaleWPercent,  (viewportHeight - 15*game.font.getLineHeight() + 9)/scaleHPercent, 30,30);
+
+        shapeRenderer.setColor(Color.FOREST);
+        shapeRenderer.rect((105 + glyphLayout.width)/scaleWPercent, (viewportHeight - 16*game.font.getLineHeight() + 9)/scaleHPercent, 30,30);
+
         shapeRenderer.setColor(Color.valueOf("#91fc3a"));
-        shapeRenderer.circle(49/scaleWPercent, (viewportHeight - 15*game.font.getLineHeight() + 12)/scaleHPercent, 15);
+        shapeRenderer.circle(49/scaleWPercent, (viewportHeight - 17*game.font.getLineHeight() + 14)/scaleHPercent, 15);
 
         shapeRenderer.end();
 
@@ -94,17 +94,19 @@ public class TutorialScreen implements Screen, InputProcessor {
         game.font.draw(game.batch, "The towers will target and shoot enemies that share a type with itself.", 0, viewportHeight - 5*game.font.getLineHeight());
         game.font.draw(game.batch, "To spawn a tower the player should tap on a tower tile.", 0, viewportHeight - 6*game.font.getLineHeight());
         game.font.draw(game.batch, "To change a tower's type the user should tap a tower.", 0, viewportHeight - 7*game.font.getLineHeight());
-        game.font.draw(game.batch, "Type changes are free within 5 seconds of creating or changing types.", 0, viewportHeight - 8*game.font.getLineHeight());
-        game.font.draw(game.batch, "Damage is done on a ROCK-PAPER-SCISSORS basis.", 0, viewportHeight - 9*game.font.getLineHeight());
-        game.font.draw(game.batch, "The tower color and enemy color will correspond.", 0, viewportHeight - 10*game.font.getLineHeight());
+        game.font.draw(game.batch, "To level up a tower the user should long press on the tower.", 0, viewportHeight - 8*game.font.getLineHeight());
+        game.font.draw(game.batch, "Tower's have a level cap of 5 and the cost is 30 times the current level", 0, viewportHeight - 9*game.font.getLineHeight());
+        game.font.draw(game.batch, "Type changes are free within 5 seconds of creating or changing types.", 0, viewportHeight - 10*game.font.getLineHeight());
+        game.font.draw(game.batch, "Damage is done on a ROCK-PAPER-SCISSORS basis.", 0, viewportHeight - 11*game.font.getLineHeight());
+        game.font.draw(game.batch, "The tower color and enemy color will correspond.", 0, viewportHeight - 12*game.font.getLineHeight());
 
-        game.font.draw(game.batch, "ROCK Enemy", 60, viewportHeight - 11*game.font.getLineHeight());
-        game.font.draw(game.batch, "PAPER Enemy", 60, viewportHeight - 12*game.font.getLineHeight());
-        game.font.draw(game.batch, "SCISSORS Enemy", 60, viewportHeight - 13*game.font.getLineHeight());
-        game.font.draw(game.batch, "PATH Tile", 120 + glyphLayout.width, viewportHeight - 11*game.font.getLineHeight());
-        game.font.draw(game.batch, "TOWER Tile", 120 + glyphLayout.width, viewportHeight - 12*game.font.getLineHeight());
-        game.font.draw(game.batch, "BACKGROUND Tile", 120 + glyphLayout.width, viewportHeight - 13*game.font.getLineHeight());
-        game.font.draw(game.batch, "BULLET", 60, viewportHeight - 14*game.font.getLineHeight());
+        game.font.draw(game.batch, "ROCK Enemy", 60, viewportHeight - 13*game.font.getLineHeight());
+        game.font.draw(game.batch, "PAPER Enemy", 60, viewportHeight - 14*game.font.getLineHeight());
+        game.font.draw(game.batch, "SCISSORS Enemy", 60, viewportHeight - 15*game.font.getLineHeight());
+        game.font.draw(game.batch, "PATH Tile", 120 + glyphLayout.width, viewportHeight - 13*game.font.getLineHeight());
+        game.font.draw(game.batch, "TOWER Tile", 120 + glyphLayout.width, viewportHeight - 14*game.font.getLineHeight());
+        game.font.draw(game.batch, "BACKGROUND Tile", 120 + glyphLayout.width, viewportHeight - 15*game.font.getLineHeight());
+        game.font.draw(game.batch, "BULLET", 60, viewportHeight - 16*game.font.getLineHeight());
         game.batch.end();
     }
 

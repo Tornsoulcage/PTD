@@ -1,6 +1,5 @@
 package com.ptd.csis484;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -16,8 +15,8 @@ import java.util.List;
 //Represents the tower objects
 public class Tower {
     //Used to track the tower's current level and cost to upgrade
-    private int towerLevel = 0;
-    private double towerLevelCost = 30;
+    private int towerLevel;
+    private double towerLevelCost;
 
     //Damage each bullet does
     private int baseDamage;
@@ -25,14 +24,15 @@ public class Tower {
 
     //Variables associated with creating this tower
     private int goldCost;
-    private int upgradeCost;
     private int switchCost;
 
+    //Variables to keep track of the tower's position on the map
     private float cellX = 0;
     private float cellY = 0;
     private float tileWidth;
     private float tileHeight;
 
+    //Used to time events associated with the tower
     private long timeCreated;
     private long bulletFiredTime;
 
@@ -40,8 +40,6 @@ public class Tower {
     private Enemy target = new Enemy();
 
     //Variables to help find the closet enemy
-    private double targetXDist;
-    private double targetYDist;
     private double targetDist;
 
     //This towers type, used to determine which enemies it can hit and it's stats
@@ -56,7 +54,7 @@ public class Tower {
         this.type = "NO_TOWER_TYPE";
     }
 
-    //Main constructor, passes the desired type and it's location on the map
+    //Main constructor, accepts the desired type and it's location on the map
     public Tower(String type, float cellX, float cellY, Map gameMap){
         this.type = type;
         this.timeCreated = System.currentTimeMillis();
@@ -64,6 +62,8 @@ public class Tower {
         //Recording the cell the tower resides in
         this.cellX = cellX;
         this.cellY = cellY;
+
+        //Getting the tile width/height. Used for scaling the size of the tower
         this.tileHeight = gameMap.getTileHeight();
         this.tileWidth = gameMap.getTileWidth();
 
@@ -72,38 +72,43 @@ public class Tower {
         float positionX = cellX*tileWidth + tileWidth/2;
         float positionY = gameMap.getDeviceHeight() - 1 - (cellY*tileHeight) - tileHeight/2;
 
-        targetDist = gameMap.getDeviceHeight();
+        //We use the device width because it's the longest distance feasible for the map
+        targetDist = gameMap.getDeviceWidth();
 
         //Setting the costs for all towers
         goldCost = 30;
-        upgradeCost = 15;
         switchCost = 10;
 
         //Setting the position of the tower
         this.position = new Vector2(positionX, positionY);
 
+        //Used to help scale the towers
+        towerLevel = 0;
+        towerLevelCost = 30;
+
         //Depending on the tower type we change it's variables
         this.baseDamage = 2;
-        this.scaledDamage = 2;
+        this.scaledDamage = baseDamage;
     }
 
-    //Just draws a red rectangle to represent the tower
+    //Draws a different colored square depending on the tower type
     public void render(ShapeRenderer renderer){
+        //Used to help scale the size of the tower
         float towerHeight = (float) (tileHeight * (.25 + .1*towerLevel));
         float towerWidth = (float) (tileWidth * (.25 + .1*towerLevel));
         Vector2 adjustedPosition = new Vector2(position.x - towerWidth/2, position.y - towerHeight/2);
 
-        if(type == "ROCK"){
+        if(type.equals("ROCK")){
             renderer.setColor(Color.BLACK);
             renderer.set(ShapeRenderer.ShapeType.Filled);
             renderer.rect(adjustedPosition.x, adjustedPosition.y, towerWidth,towerHeight);
         }
-        if(type == "PAPER"){
+        if(type.equals("PAPER")){
             renderer.setColor(Color.BLUE);
             renderer.set(ShapeRenderer.ShapeType.Filled);
             renderer.rect(adjustedPosition.x, adjustedPosition.y, towerWidth,towerHeight);
         }
-        if(type == "SCISSORS"){
+        if(type.equals("SCISSORS")){
             renderer.setColor(Color.RED);
             renderer.set(ShapeRenderer.ShapeType.Filled);
             renderer.rect(adjustedPosition.x, adjustedPosition.y, towerWidth,towerHeight);
@@ -114,6 +119,7 @@ public class Tower {
     public void update(List<Enemy> enemyList) {
         //Variable to hold temp distance for each enemy
         double newTargetDist;
+
         //Only runs if there is a enemy
         if (!enemyList.isEmpty()) {
             //Loops through the enemy list
@@ -123,10 +129,11 @@ public class Tower {
                     this.target = new Enemy();
                 }
 
+                //Towers will only shoot at enemies that share their type
                 if(enemy.getType().equals(this.type)) {
                     //Gets the current distance to the target
-                    targetXDist = Math.abs((position.x - target.getPosition().x));
-                    targetYDist = Math.abs((position.y - target.getPosition().y));
+                    double targetXDist = Math.abs((position.x - target.getPosition().x));
+                    double targetYDist = Math.abs((position.y - target.getPosition().y));
                     targetDist = Math.sqrt((targetXDist * targetXDist + targetYDist * targetYDist));
 
                     //Gets the distance to the potential target
@@ -161,57 +168,13 @@ public class Tower {
         this.towerLevelCost = towerLevelCost;
     }
 
-    public void setScaledDamage(double scaledDamage) {
-        this.scaledDamage = scaledDamage;
-    }
-
-    public int getBaseDamage() {
-        return baseDamage;
-    }
-
-    public void setBaseDamage(int baseDamage) {
-        this.baseDamage = baseDamage;
-    }
-
     public double getScaledDamage(){
         scaledDamage = scaledDamage * (1 + .5 * towerLevel);
         return scaledDamage;
     }
 
-    public void setScaledDamage(int scaledDamage) {
-        this.scaledDamage = scaledDamage;
-    }
-
     public Enemy getTarget() {
         return target;
-    }
-
-    public void setTarget(Enemy target) {
-        this.target = target;
-    }
-
-    public double getTargetXDist() {
-        return targetXDist;
-    }
-
-    public void setTargetXDist(double targetXDist) {
-        this.targetXDist = targetXDist;
-    }
-
-    public double getTargetYDist() {
-        return targetYDist;
-    }
-
-    public void setTargetYDist(double targetYDist) {
-        this.targetYDist = targetYDist;
-    }
-
-    public double getTargetDist() {
-        return targetDist;
-    }
-
-    public void setTargetDist(double targetDist) {
-        this.targetDist = targetDist;
     }
 
     public String getType() {
@@ -226,48 +189,20 @@ public class Tower {
         return position;
     }
 
-    public void setPosition(Vector2 position) {
-        this.position = position;
-    }
-
     public float getCellX() {
         return cellX;
-    }
-
-    public void setCellX(float cellX) {
-        this.cellX = cellX;
     }
 
     public float getCellY() {
         return cellY;
     }
 
-    public void setCellY(float cellY) {
-        this.cellY = cellY;
-    }
-
     public int getGoldCost() {
         return goldCost;
     }
 
-    public void setGoldCost(int goldCost) {
-        this.goldCost = goldCost;
-    }
-
-    public int getUpgradeCost() {
-        return upgradeCost;
-    }
-
-    public void setUpgradeCost(int upgradeCost) {
-        this.upgradeCost = upgradeCost;
-    }
-
     public int getSwitchCost() {
         return switchCost;
-    }
-
-    public void setSwitchCost(int switchCost) {
-        this.switchCost = switchCost;
     }
 
     public long getTimeCreated() {
