@@ -56,9 +56,12 @@ public class GameScreen implements Screen, InputProcessor {
     private List<Tower> towerList = new ArrayList<Tower>();
     private List<Vector2> occupiedCells = new ArrayList<Vector2>();
     private List<Bullet> bulletList = new ArrayList<Bullet>();
+    private boolean occupiedCell;
 
     private int gold = 100;
     private int remainingLife = 20;
+
+    private long touchTime;
 
     //Creating the Screen and rendering a test map
     public GameScreen(final PTD game) {
@@ -239,15 +242,15 @@ public class GameScreen implements Screen, InputProcessor {
         Tower tower = new Tower();
         switch ((int) towerToSpawn) {
             case 0:
-                tower = new Tower("ROCK", cellX, cellY);
+                tower = new Tower("ROCK", cellX, cellY, gameMap);
                 rockCount++;
                 break;
             case 1:
-                tower = new Tower("PAPER", cellX, cellY);
+                tower = new Tower("PAPER", cellX, cellY, gameMap);
                 paperCount++;
                 break;
             case 2:
-                tower = new Tower("SCISSORS", cellX, cellY);
+                tower = new Tower("SCISSORS", cellX, cellY, gameMap);
                 scissorsCount++;
                 break;
         }
@@ -321,6 +324,9 @@ public class GameScreen implements Screen, InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        //We register the time the user tap to see if they are doing a long press
+        touchTime = System.currentTimeMillis();
+
         //Figuring our which spot on the grid the user tapped
         float cellX = screenX/gameMap.getTileWidth();
         float cellY = screenY/gameMap.getTileHeight();
@@ -330,7 +336,7 @@ public class GameScreen implements Screen, InputProcessor {
         //If it is a tower tile we check other traits
         if((gameMap.getMapArray()[(int)(gameMap.getTILE_Y_COUNT() - 1 - cellY)][(int)cellX]) == 't'){
             //Shows whether or not the cell in question is already occupied
-            boolean occupiedCell = false;
+            occupiedCell = false;
 
             //Loops through all of our occupied cells to check occupancy
             for (Vector2 vector : occupiedCells) {
@@ -343,16 +349,43 @@ public class GameScreen implements Screen, InputProcessor {
             if (!occupiedCell) {
                 spawnTower(cellX, cellY);
             }
+        }
 
-            //If the cell is occupied we change the tower type
-            if(occupiedCell){
-                for(Tower tower : towerList){
-                    if(tower.getCellX() == cellX && tower.getCellY() == cellY){
+        return false;
+    }
+
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        //Figuring our which spot on the grid the user tapped
+        float cellX = screenX / gameMap.getTileWidth();
+        float cellY = screenY / gameMap.getTileHeight();
+        cellX = MathUtils.floor(cellX);
+        cellY = MathUtils.floor(cellY);
+
+        if (occupiedCell) {
+            if (System.currentTimeMillis() - touchTime > 500) {
+                //If the cell is occupied we change the tower type
+                for (Tower tower : towerList) {
+                    if (tower.getCellX() == cellX && tower.getCellY() == cellY) {
+                        if (tower.getTowerLevel() < 5) {
+                            if (gold >= tower.getTowerLevelCost()) {
+                                gold -= tower.getTowerLevelCost();
+                                tower.setTowerLevelCost(tower.getTowerLevelCost() * 1.05);
+                                tower.setTowerLevel(tower.getTowerLevel() + 1);
+                            }
+                        }
+                        break;
+                    }
+                }
+            } else {
+                //If the cell is occupied we change the tower type
+                for (Tower tower : towerList) {
+                    if (tower.getCellX() == cellX && tower.getCellY() == cellY) {
                         //If it's within 5 seconds of a tower change or creation the change is free
-                        if((System.currentTimeMillis() - tower.getTimeCreated()) < 5000){
+                        if ((System.currentTimeMillis() - tower.getTimeCreated()) < 5000) {
                             changeTowerType(tower);
                             tower.setTimeCreated(System.currentTimeMillis());
-                        } else if(gold >= tower.getSwitchCost()){
+                        } else if (gold >= tower.getSwitchCost()) {
                             changeTowerType(tower);
                             gold -= tower.getSwitchCost();
                             tower.setTimeCreated(System.currentTimeMillis());
@@ -363,11 +396,6 @@ public class GameScreen implements Screen, InputProcessor {
             }
         }
 
-        return false;
-    }
-
-    @Override
-    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         return false;
     }
 

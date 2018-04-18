@@ -13,7 +13,7 @@ import com.badlogic.gdx.math.Vector2;
  */
 
 public class Bullet {
-    private int damage;
+    private double damage;
     private Enemy target;
     private Tower source;
     private int speed;
@@ -28,7 +28,7 @@ public class Bullet {
 
     public Bullet(Enemy target, Tower source){
         this.source = source;
-        this.damage = source.getBaseDamage();
+        this.damage = source.getScaledDamage();
         this.target = target;
 
         //How many pixels the bullet passes each frame
@@ -67,11 +67,11 @@ public class Bullet {
         bounds = new Rectangle(position.x, position.y, 10,10);
     }
 
-    public int getDamage() {
+    public double getDamage() {
         return damage;
     }
 
-    public void setDamage(int damage) {
+    public void setDamage(double damage) {
         this.damage = damage;
     }
 

@@ -15,22 +15,23 @@ import java.util.List;
 
 //Represents the tower objects
 public class Tower {
+    //Used to track the tower's current level and cost to upgrade
+    private int towerLevel = 0;
+    private double towerLevelCost = 30;
+
     //Damage each bullet does
     private int baseDamage;
-    private int scaledDamage;
-
-    //Variables used to help calculate position
-    private float deviceHeight = Gdx.graphics.getHeight();
-    private float deviceWidth = Gdx.graphics.getWidth();
-    private float tileHeight = deviceHeight/10;
-    private float tileWidth = deviceWidth/15;
-    private float cellX = 0;
-    private float cellY = 0;
+    private double scaledDamage;
 
     //Variables associated with creating this tower
     private int goldCost;
     private int upgradeCost;
     private int switchCost;
+
+    private float cellX = 0;
+    private float cellY = 0;
+    private float tileWidth;
+    private float tileHeight;
 
     private long timeCreated;
     private long bulletFiredTime;
@@ -56,19 +57,22 @@ public class Tower {
     }
 
     //Main constructor, passes the desired type and it's location on the map
-    public Tower(String type, float cellX, float cellY){
+    public Tower(String type, float cellX, float cellY, Map gameMap){
         this.type = type;
         this.timeCreated = System.currentTimeMillis();
 
         //Recording the cell the tower resides in
         this.cellX = cellX;
         this.cellY = cellY;
+        this.tileHeight = gameMap.getTileHeight();
+        this.tileWidth = gameMap.getTileWidth();
 
         //Formula's to convert cellX and cellY to the x/y position on the map
+        //Places the pointer in the center of the tile
         float positionX = cellX*tileWidth + tileWidth/2;
-        float positionY = deviceHeight - 1 - (cellY*tileHeight) - tileHeight/2;
+        float positionY = gameMap.getDeviceHeight() - 1 - (cellY*tileHeight) - tileHeight/2;
 
-        targetDist = deviceWidth;
+        targetDist = gameMap.getDeviceHeight();
 
         //Setting the costs for all towers
         goldCost = 30;
@@ -80,25 +84,29 @@ public class Tower {
 
         //Depending on the tower type we change it's variables
         this.baseDamage = 2;
-
+        this.scaledDamage = 2;
     }
 
     //Just draws a red rectangle to represent the tower
     public void render(ShapeRenderer renderer){
+        float towerHeight = (float) (tileHeight * (.25 + .1*towerLevel));
+        float towerWidth = (float) (tileWidth * (.25 + .1*towerLevel));
+        Vector2 adjustedPosition = new Vector2(position.x - towerWidth/2, position.y - towerHeight/2);
+
         if(type == "ROCK"){
             renderer.setColor(Color.BLACK);
             renderer.set(ShapeRenderer.ShapeType.Filled);
-            renderer.rect(position.x, position.y, 20,20);
+            renderer.rect(adjustedPosition.x, adjustedPosition.y, towerWidth,towerHeight);
         }
         if(type == "PAPER"){
             renderer.setColor(Color.BLUE);
             renderer.set(ShapeRenderer.ShapeType.Filled);
-            renderer.rect(position.x, position.y, 20,20);
+            renderer.rect(adjustedPosition.x, adjustedPosition.y, towerWidth,towerHeight);
         }
         if(type == "SCISSORS"){
             renderer.setColor(Color.RED);
             renderer.set(ShapeRenderer.ShapeType.Filled);
-            renderer.rect(position.x, position.y, 20,20);
+            renderer.rect(adjustedPosition.x, adjustedPosition.y, towerWidth,towerHeight);
         }
     }
 
@@ -137,6 +145,26 @@ public class Tower {
         }
     }
 
+    public int getTowerLevel() {
+        return towerLevel;
+    }
+
+    public void setTowerLevel(int towerLevel) {
+        this.towerLevel = towerLevel;
+    }
+
+    public double getTowerLevelCost() {
+        return towerLevelCost;
+    }
+
+    public void setTowerLevelCost(double towerLevelCost) {
+        this.towerLevelCost = towerLevelCost;
+    }
+
+    public void setScaledDamage(double scaledDamage) {
+        this.scaledDamage = scaledDamage;
+    }
+
     public int getBaseDamage() {
         return baseDamage;
     }
@@ -145,44 +173,13 @@ public class Tower {
         this.baseDamage = baseDamage;
     }
 
-    public int getScaledDamage() {
+    public double getScaledDamage(){
+        scaledDamage = scaledDamage * (1 + .5 * towerLevel);
         return scaledDamage;
     }
 
     public void setScaledDamage(int scaledDamage) {
         this.scaledDamage = scaledDamage;
-    }
-
-    public float getDeviceHeight() {
-        return deviceHeight;
-    }
-
-    public void setDeviceHeight(float deviceHeight) {
-        this.deviceHeight = deviceHeight;
-    }
-
-    public float getDeviceWidth() {
-        return deviceWidth;
-    }
-
-    public void setDeviceWidth(float deviceWidth) {
-        this.deviceWidth = deviceWidth;
-    }
-
-    public float getTileHeight() {
-        return tileHeight;
-    }
-
-    public void setTileHeight(float tileHeight) {
-        this.tileHeight = tileHeight;
-    }
-
-    public float getTileWidth() {
-        return tileWidth;
-    }
-
-    public void setTileWidth(float tileWidth) {
-        this.tileWidth = tileWidth;
     }
 
     public Enemy getTarget() {
