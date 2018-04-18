@@ -19,7 +19,7 @@ public class Tower {
     private double towerLevelCost;
 
     //Damage each bullet does
-    private int baseDamage;
+    private double baseDamage;
     private double scaledDamage;
 
     //Variables associated with creating this tower
@@ -84,7 +84,7 @@ public class Tower {
 
         //Used to help scale the towers
         towerLevel = 0;
-        towerLevelCost = 30;
+        towerLevelCost = 75;
 
         //Depending on the tower type we change it's variables
         this.baseDamage = 2;
@@ -169,7 +169,7 @@ public class Tower {
     }
 
     public double getScaledDamage(){
-        scaledDamage = scaledDamage * (1 + .5 * towerLevel);
+        scaledDamage = scaledDamage * (1 + .20 * towerLevel);
         return scaledDamage;
     }
 

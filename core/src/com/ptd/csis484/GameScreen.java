@@ -94,6 +94,12 @@ public class GameScreen implements Screen, InputProcessor {
         if (enemyList.isEmpty() && enemyCount == 20) {
             waveNumber++;
             enemyCount = 0;
+
+            //If we get to wave 15 we start a new map
+            if(waveNumber > 15){
+                game.setScreen(new WaveOverScreen(game));
+                dispose();
+            }
         }
 
         shapeRenderer.end();
@@ -115,7 +121,7 @@ public class GameScreen implements Screen, InputProcessor {
     //Function to spawn a new enemy
     private void spawnEnemy(){
         //Spawns a new enemy every second
-        if (System.currentTimeMillis() - enemySpawnedTime >= 1000) {
+        if (System.currentTimeMillis() - enemySpawnedTime >= 350) {
             //If we havent reached the max number of enemies for the wave yet
             if (enemyCount != 20) {
                 //Setting the default rate each enemy is spawned
@@ -179,6 +185,7 @@ public class GameScreen implements Screen, InputProcessor {
                     game.setScreen(new GameOverScreen(game));
                     dispose();
                 }
+
             } else if (enemy.getHealth() <= 0) {
                 enemy.setDestroyed(true);
                 gold += enemy.getGoldValue();

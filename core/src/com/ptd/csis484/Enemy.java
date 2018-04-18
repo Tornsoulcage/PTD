@@ -50,17 +50,18 @@ public class Enemy {
     public Enemy(String type, int wave, Map gameMap){
         //Different values are passed depending on the enemy type
         //Enemies stats increase by five percent each wave
-        waveScale = (float) (1 + wave * .05);
+        waveScale = (float) (1 + wave * .20);
 
-        this.speed = 2 * waveScale;
-        this.health = 3 * waveScale;
+        this.speed = 3 * waveScale;
+        this.health = 6 * waveScale;
         this.type = type;
 
         //Setting position equal to the start tile
         position = new Vector2(gameMap.getWaypointStart().x, gameMap.getWaypointStart().y);
 
         //Setting our initial bounds
-        bounds = new Rectangle(position.x, position.y, 32, 32);
+        Vector2 adjustedPosition = new Vector2(position.x - 16, position.y - 16);
+        bounds = new Rectangle(adjustedPosition.x, adjustedPosition.y, 32, 32);
 
         //Marking the enemy undestroyed
         destroyed = false;
