@@ -28,7 +28,7 @@ public class Bullet {
 
     public Bullet(Enemy target, Tower source){
         this.source = source;
-        this.damage = source.getScaledDamage();
+        this.damage = source.getBaseDamage();
         this.target = target;
 
         //How many pixels the bullet passes each frame

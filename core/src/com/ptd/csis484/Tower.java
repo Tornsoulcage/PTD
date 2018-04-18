@@ -79,15 +79,8 @@ public class Tower {
         this.position = new Vector2(positionX, positionY);
 
         //Depending on the tower type we change it's variables
-        if (this.type == "ROCK") {
-            baseDamage = 3;
-        }
-        if (this.type == "PAPER") {
-            baseDamage = 1;
-        }
-        if (this.type == "SCISSORS") {
-            baseDamage = 2;
-        }
+        this.baseDamage = 2;
+
     }
 
     //Just draws a red rectangle to represent the tower

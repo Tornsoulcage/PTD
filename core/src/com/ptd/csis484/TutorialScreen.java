@@ -90,8 +90,8 @@ public class TutorialScreen implements Screen, InputProcessor {
         game.font.draw(game.batch, "Welcome to PTD.", 0, viewportHeight);
         game.font.draw(game.batch, "PTD is a tower defense game with the same basic goals of the genre.", 0, viewportHeight - 2*game.font.getLineHeight());
         game.font.draw(game.batch, "Enemies will spawn at random and move towards the end of the path.", 0, viewportHeight - 3*game.font.getLineHeight());
-        game.font.draw(game.batch, "The players goal is to spawn towers on the proper tiles,", 0, viewportHeight - 4*game.font.getLineHeight());
-        game.font.draw(game.batch, "the towers will then target and shoot enemies to destroy them.", 0, viewportHeight - 5*game.font.getLineHeight());
+        game.font.draw(game.batch, "The players goal is to spawn towers on the proper tiles.", 0, viewportHeight - 4*game.font.getLineHeight());
+        game.font.draw(game.batch, "The towers will target and shoot enemies that share a type with itself.", 0, viewportHeight - 5*game.font.getLineHeight());
         game.font.draw(game.batch, "To spawn a tower the player should tap on a tower tile.", 0, viewportHeight - 6*game.font.getLineHeight());
         game.font.draw(game.batch, "To change a tower's type the user should tap a tower.", 0, viewportHeight - 7*game.font.getLineHeight());
         game.font.draw(game.batch, "Type changes are free within 5 seconds of creating or changing types.", 0, viewportHeight - 8*game.font.getLineHeight());

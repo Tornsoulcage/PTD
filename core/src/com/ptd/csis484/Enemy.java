@@ -58,21 +58,9 @@ public class Enemy {
         //Enemies stats increase by one percent each wave
         waveScale = (float) (1 + wave * .05);
 
-        if(type == "ROCK") {
-            this.speed = 2 * waveScale;
-            this.health = 5* waveScale;
-            this.type = type;
-        }
-        if(type == "SCISSORS"){
-            this.speed = 5* waveScale;
-            this.health = 3* waveScale;
-            this.type = type;
-        }
-        if(type == "PAPER"){
-            this.speed = 3* waveScale;
-            this.health = 1* waveScale;
-            this.type = type;
-        }
+        this.speed = 2 * waveScale;
+        this.health = 3 * waveScale;
+        this.type = type;
 
         //Setting position equal to the start tile
         position = new Vector2(gameMap.getWaypointStart().x, gameMap.getWaypointStart().y);
