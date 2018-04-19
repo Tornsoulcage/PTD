@@ -342,6 +342,22 @@ public class Map {
 
         //After the waypoints are sorted we add in the final waypoint, the exit one.
         waypointBounds.add(new Rectangle(waypointEnd.x, waypointEnd.y, tileWidth / 3, tileHeight / 3));
+
+        double extraPath = Math.random();
+        if(extraPath >= 1){
+            additionalPath();
+        }
+    }
+
+    //Creates a fork in the path
+    private void additionalPath(){
+        int forkIndex = (int) (Math.random()*TILE_X_COUNT);
+        
+        for(int y = 0; y < mapArray.length; y++){
+            if(mapArray[y][forkIndex] == 'p'){
+
+            }
+        }
     }
 
     //Getters and Setters for our variables
