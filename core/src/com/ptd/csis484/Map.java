@@ -40,6 +40,7 @@ public class Map {
 
     //Used to keep track of the map and where enemies should go
     private char mapArray[][] = new char[TILE_Y_COUNT][];
+    private List<List> waypointSets = new ArrayList<List>();
     private List<Rectangle> waypointBounds = new ArrayList<Rectangle>();
     private Vector2 waypointStart = new Vector2();
     private Vector2 waypointEnd = new Vector2();
@@ -343,6 +344,10 @@ public class Map {
         //After the waypoints are sorted we add in the final waypoint, the exit one.
         waypointBounds.add(new Rectangle(waypointEnd.x, waypointEnd.y, tileWidth / 3, tileHeight / 3));
 
+        waypointBounds.add(0, new Rectangle(waypointStart.x, waypointStart.y, tileWidth/3, tileHeight/3));
+
+        waypointSets.add(waypointBounds);
+
         double extraPath = Math.random();
         if(extraPath >= 1){
             additionalPath();
@@ -352,7 +357,7 @@ public class Map {
     //Creates a fork in the path
     private void additionalPath(){
         int forkIndex = (int) (Math.random()*TILE_X_COUNT);
-        
+
         for(int y = 0; y < mapArray.length; y++){
             if(mapArray[y][forkIndex] == 'p'){
 
@@ -409,4 +414,17 @@ public class Map {
         return mapArray;
     }
 
+    public List<Rectangle> getWaypointSets(int i) {
+        if(i == 0){
+            return waypointBounds;
+        }
+        if(i == 1){
+           // return waypointBounds2;
+        }
+        return null;
+    }
+
+    public void setWaypointSets(List<List> waypointSets) {
+        this.waypointSets = waypointSets;
+    }
 }

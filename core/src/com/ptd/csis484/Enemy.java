@@ -30,9 +30,13 @@ public class Enemy {
 
     //Used to track the enemy's position and which waypoints have been passed
     private Vector2 position = new Vector2();
-    private int currentWaypoint = 0;
+    private int currentWaypoint = 1;
     private Vector2 direction = new Vector2();
     private Vector2 velocity = new Vector2();
+
+    //If the map has more than one path this will decide which path to follow
+    private int waypointSet;
+    private List<Rectangle> waypointBounds;
 
     //Bounds of the enemy's rectangle
     private Rectangle bounds;
@@ -45,6 +49,7 @@ public class Enemy {
         this.goldValue = 0;
         this.position = new Vector2(0,0);
         this.type = "NO_ENEMY_TYPE";
+        this.waypointSet = 0;
     }
 
     public Enemy(String type, int wave, Map gameMap){
@@ -55,9 +60,12 @@ public class Enemy {
         this.speed = 3 * waveScale;
         this.health = 6 * waveScale;
         this.type = type;
+        this.waypointSet = 0;
+
+        this.waypointBounds = gameMap.getWaypointSets(waypointSet);
 
         //Setting position equal to the start tile
-        position = new Vector2(gameMap.getWaypointStart().x, gameMap.getWaypointStart().y);
+        position = new Vector2(waypointBounds.get(0).x, waypointBounds.get(0).y);
 
         //Setting our initial bounds
         Vector2 adjustedPosition = new Vector2(position.x - 16, position.y - 16);
@@ -104,7 +112,7 @@ public class Enemy {
         bulletList.removeAll(toRemove);
 
         //Setting our movement vectors
-        Vector2 targetPosition = new Vector2(gameMap.getWaypointBounds().get(currentWaypoint).getX(), gameMap.getWaypointBounds().get(currentWaypoint).getY());
+        Vector2 targetPosition = new Vector2(waypointBounds.get(currentWaypoint).getX(), waypointBounds.get(currentWaypoint).getY());
         this.direction.set(targetPosition).sub(position).nor();
         velocity.set(direction).scl(speed);
 
@@ -115,7 +123,7 @@ public class Enemy {
         bounds = new Rectangle(position.x, position.y, 32, 32);
 
         //If the enemy crosses over the waypoint we count it as passed
-        if(this.bounds.overlaps(gameMap.getWaypointBounds().get(currentWaypoint))){
+        if(this.bounds.overlaps(waypointBounds.get(currentWaypoint))){
             currentWaypoint++;
         }
     }
