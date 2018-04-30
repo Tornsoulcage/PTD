@@ -407,6 +407,9 @@ public class GameScreen implements Screen, InputProcessor {
                     }
                 }
             }
+        } else {
+            game.setScreen(new GameScreen(game));
+            this.dispose();
         }
         return false;
     }
