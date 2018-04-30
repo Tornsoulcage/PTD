@@ -408,8 +408,10 @@ public class GameScreen implements Screen, InputProcessor {
                 }
             }
         } else {
-            game.setScreen(new GameScreen(game));
-            this.dispose();
+            if(gameMap.getMapArray()[(int)(gameMap.getTILE_Y_COUNT() - 1 - cellY)][(int)cellX] == 'x') {
+                game.setScreen(new GameScreen(game));
+                this.dispose();
+            }
         }
         return false;
     }
