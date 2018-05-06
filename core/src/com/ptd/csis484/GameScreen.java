@@ -340,11 +340,11 @@ public class GameScreen implements Screen, InputProcessor {
         cellX = MathUtils.floor(cellX);
         cellY = MathUtils.floor(cellY);
 
+        //Shows whether or not the cell in question is already occupied
+        occupiedCell = false;
+
         //If it is a tower tile we check other traits
         if((gameMap.getMapArray()[(int)(gameMap.getTILE_Y_COUNT() - 1 - cellY)][(int)cellX]) == 't'){
-            //Shows whether or not the cell in question is already occupied
-            occupiedCell = false;
-
             //Loops through all of our occupied cells to check occupancy
             for (Vector2 vector : occupiedCells) {
                 if (vector.x == cellX && vector.y == cellY) {
